@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Transaction History</h2>
+<section class="panel">
+  {% if events %}
+    <table>
+      <thead><tr><th>Date</th><th>Type</th><th>Issue</th><th>Item</th><th>Responsible User</th><th>Details</th></tr></thead>
+      <tbody>
+      {% for event in events|reverse %}
+        <tr>
+          <td>{{ event.date }}</td>
+          <td>{{ event.type.replace('_', ' ') }}</td>
+          <td>{{ event.issue_id or '-' }}</td>
+          <td>{{ event.item_code or '-' }}</td>
+          <td>{{ event.responsible_user }}</td>
+          <td>{{ event.details }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No transactions recorded yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

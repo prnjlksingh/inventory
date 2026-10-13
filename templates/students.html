@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Students</h2>
+<section class="panel">
+  {% if students %}
+    <table>
+      <thead><tr><th>Enrolment</th><th>Name</th><th>Programme</th><th>Semester</th><th>Contact</th><th></th></tr></thead>
+      <tbody>
+      {% for student in students %}
+        <tr>
+          <td>{{ student.enrolment_number }}</td>
+          <td>{{ student.name }}</td>
+          <td>{{ student.programme }}</td>
+          <td>{{ student.semester }}</td>
+          <td>{{ student.contact_details }}</td>
+          <td><a href="{{ url_for('student_detail', enrolment=student.enrolment_number) }}">View details</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No students registered yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,104 +1,67 @@
-# Department Inventory System
+# Inventory Management MVP (Hackathon Edition)
 
-Lightweight Python inventory domain engine for department issue/return workflows with:
+A demo-friendly inventory management app with a polished Flask UI and essential backend safeguards.
 
-- quantity-tracked consumables/equipment
-- individually tracked assets
-- 15-day issue/renewal due-cycle rules
-- audit/event history and reporting helpers
+## What this MVP includes
 
-## Setup
+- Dashboard with **total, available, issued, overdue, damaged, and lost** metrics
+- Inventory list with search/filter and stock status badges
+- Add/edit inventory item form
+- Student list + student detail records
+- Issue and return workflows with clear success/error feedback
+- Overdue and upcoming returns view
+- Transaction/activity history
+- Seeded demo data available automatically at startup
+
+## Essential business safeguards kept
+
+- Cannot issue unavailable stock
+- Student and item must exist for issue
+- Return quantity cannot exceed outstanding quantity
+- Asset-tracked item issue requires a valid available asset
+
+## Local setup and run
 
 ```bash
+cd /home/runner/work/inventory/inventory
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+pip install -r requirements.txt
+python app.py
 ```
 
-No third-party dependencies are required.
+Open: `http://127.0.0.1:5000`
+
+> No authentication is enabled for this MVP, so no demo credentials are required.
 
 ## Run tests
 
 ```bash
+cd /home/runner/work/inventory/inventory
 python -m unittest discover -s tests -q
 ```
 
-## Core domain rules
+## Demo data
 
-- A student must be registered before issue.
-- `issue_date` defaults to today; `due_date = issue_date + 15 days`.
-- Renewal request **does not** change due date.
-- Approved renewal extends from current due date by 15 days.
-- Renewal review requires a pending renewal request.
-- Returns cannot exceed outstanding quantity or predate issue date.
-- Asset-tracked issues require exactly one asset and exclusive issuance.
-- Quantity stock invariants are enforced: `issued + unavailable <= total`.
+Demo data is seeded automatically when the app starts. It includes:
 
-## Basic usage
+- Multiple students
+- Quantity and asset-tracked inventory items
+- Open/overdue/upcoming issues
+- Damaged/lost examples
+- Pre-populated activity history
 
-```python
-from datetime import date
-from inventory_system import DepartmentInventorySystem
+## 3-minute hackathon demo flow
 
-system = DepartmentInventorySystem()
-system.register_student("Alice", "ENR-001", "M.Sc. DFIS", "I", "alice@example.com")
-system.add_inventory_item("USB-CBL", "USB Cable", "Cable", "Reusable cable", "Type-C", 20)
+1. Open **Dashboard** to show inventory health and due-risk snapshot.
+2. Go to **Inventory** and filter/search items.
+3. Open **Students** and show one student’s active records.
+4. Open **Issue & Return**:
+   - Issue an item to a student
+   - Record a return
+5. Revisit **Dashboard** and **History** to show updates reflected instantly.
 
-issue = system.issue_item(
-    student_enrolment="ENR-001",
-    item_code="USB-CBL",
-    quantity=2,
-    purpose="Lab work",
-    issuing_staff="coord",
-    issue_date=date(2026, 10, 1),
-)
+## Scope note
 
-system.request_renewal(issue.issue_id, request_date=date(2026, 10, 10), requested_by="ENR-001")
-system.review_renewal(
-    issue.issue_id,
-    approval_status="approved",
-    approval_date=date(2026, 10, 11),
-    approving_staff="coord",
-)
-```
-
-## API overview
-
-Key methods:
-
-- Student/item/asset setup:
-  - `register_student`
-  - `add_inventory_item`
-  - `add_asset`
-- Transactional operations:
-  - `issue_item`
-  - `record_return` (supports partial returns)
-  - `request_renewal`
-  - `review_renewal`
-  - `record_stock_adjustment`
-  - `retire_stock`
-- Condition + stock helpers:
-  - `update_asset_condition`
-  - `get_available_quantity`
-  - `get_issued_quantity`
-  - `get_inventory_status`
-- Reporting:
-  - `get_overdue_items`
-  - `get_upcoming_due_items`
-  - `get_student_records`
-  - `get_programme_records`
-  - `get_item_records`
-  - `get_lab_records`
-  - `get_transaction_history`
-
-## Error handling
-
-All domain exceptions inherit from `InventoryError` with specialized subclasses:
-
-- `StudentValidationError`
-- `ItemValidationError`
-- `AssetValidationError`
-- `IssueValidationError`
-- `ReturnValidationError`
-- `RenewalValidationError`
-- `StockIntegrityError`
+This repository is intentionally focused on MVP workflows and UI polish for demo readiness. Advanced rule engines and enterprise-hardening workflows are intentionally de-prioritized for the hackathon phase.

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Overdue & Upcoming Returns</h2>
+<section class="panel">
+  <h3>Overdue</h3>
+  {% if overdue_items %}
+    <table>
+      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due date</th><th>Overdue days</th></tr></thead>
+      <tbody>
+      {% for row in overdue_items %}
+        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td><td>{{ row.overdue_days }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No overdue returns.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h3>Upcoming (Next 5 days)</h3>
+  {% if upcoming_items %}
+    <table>
+      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due date</th></tr></thead>
+      <tbody>
+      {% for row in upcoming_items %}
+        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No upcoming due returns.</p>
+  {% endif %}
+</section>
+{% endblock %}

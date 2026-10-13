@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Inventory</h2>
+<section class="panel">
+  <form class="inline" method="get" action="{{ url_for('inventory_list') }}">
+    <div>
+      <label for="q">Search item</label>
+      <input id="q" name="q" value="{{ query }}" placeholder="Code or name" />
+    </div>
+    <div>
+      <label for="category">Category</label>
+      <select id="category" name="category">
+        <option value="">All categories</option>
+        {% for c in categories %}
+          <option value="{{ c }}" {{ 'selected' if category == c.lower() else '' }}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="actions">
+      <button type="submit">Apply filter</button>
+      <a href="{{ url_for('inventory_list') }}"><button type="button" class="secondary">Reset</button></a>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="actions" style="justify-content: space-between; margin-bottom: 0.6rem;">
+    <h3 style="margin: 0;">Stock</h3>
+    <a href="{{ url_for('add_inventory_item') }}"><button type="button">Add item</button></a>
+  </div>
+  {% if rows %}
+    <table>
+      <thead><tr><th>Item</th><th>Category</th><th>Total</th><th>Available</th><th>Issued</th><th>Damaged</th><th>Lost</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+      {% for row in rows %}
+        {% set item = row.item %}
+        {% set status = row.status %}
+        <tr>
+          <td><strong>{{ item.code }}</strong><br /><span class="muted">{{ item.name }}</span></td>
+          <td>{{ item.category }}</td>
+          <td>{{ status.total }}</td>
+          <td>{{ status.available }}</td>
+          <td>{{ status.issued }}</td>
+          <td>{{ status.damaged }}</td>
+          <td>{{ status.lost }}</td>
+          <td>
+            {% if status.available == 0 %}
+              <span class="badge danger">Out of stock</span>
+            {% elif status.available <= 2 %}
+              <span class="badge warn">Low stock</span>
+            {% else %}
+              <span class="badge success">In stock</span>
+            {% endif %}
+          </td>
+          <td><a href="{{ url_for('edit_inventory_item', item_code=item.code) }}">Edit</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No inventory items match current filters.</p>
+  {% endif %}
+</section>
+{% endblock %}
