@@ -160,6 +160,188 @@ class DepartmentInventorySystemTests(unittest.TestCase):
         self.assertEqual(len(overdue), 1)
         self.assertEqual(overdue[0]["overdue_days"], 3)
 
+    def test_renewal_review_requires_pending_request(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=1,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 1),
+        )
+        with self.assertRaises(InventoryError):
+            self.system.review_renewal(
+                issue_id=issue.issue_id,
+                approval_status="approved",
+                approval_date=date(2026, 10, 10),
+                approving_staff="coord",
+            )
+
+    def test_rejected_renewal_does_not_change_due_date(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=1,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 1),
+        )
+        self.system.request_renewal(
+            issue_id=issue.issue_id,
+            request_date=date(2026, 10, 10),
+            requested_by="ENR-001",
+        )
+        self.system.review_renewal(
+            issue_id=issue.issue_id,
+            approval_status="rejected",
+            approval_date=date(2026, 10, 11),
+            approving_staff="coord",
+        )
+        self.assertEqual(self.system.issues[issue.issue_id].due_date, date(2026, 10, 16))
+
+    def test_return_date_before_issue_date_fails(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=1,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 10),
+        )
+        with self.assertRaises(InventoryError):
+            self.system.record_return(
+                issue_id=issue.issue_id,
+                quantity_returned=1,
+                condition_on_return="usable",
+                receiving_staff="coord",
+                return_date=date(2026, 10, 9),
+            )
+
+    def test_fully_returned_issue_cannot_be_returned_again(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=1,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 10),
+        )
+        self.system.record_return(
+            issue_id=issue.issue_id,
+            quantity_returned=1,
+            condition_on_return="usable",
+            receiving_staff="coord",
+            return_date=date(2026, 10, 11),
+        )
+        with self.assertRaises(InventoryError):
+            self.system.record_return(
+                issue_id=issue.issue_id,
+                quantity_returned=1,
+                condition_on_return="usable",
+                receiving_staff="coord",
+                return_date=date(2026, 10, 12),
+            )
+
+    def test_asset_update_condition_disallows_non_usable_when_issued(self) -> None:
+        self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="DB",
+            quantity=1,
+            asset_id="DB-001",
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 1),
+        )
+        with self.assertRaises(InventoryError):
+            self.system.update_asset_condition(
+                asset_id="DB-001",
+                condition="lost",
+                updated_by="coord",
+            )
+
+    def test_asset_stock_adjustment_is_disallowed(self) -> None:
+        with self.assertRaises(InventoryError):
+            self.system.record_stock_adjustment(
+                item_code="DB",
+                quantity_delta=-1,
+                reason="manual",
+                responsible_user="coord",
+                adjustment_date=date(2026, 10, 1),
+            )
+
+    def test_duplicate_registrations_are_blocked(self) -> None:
+        with self.assertRaises(InventoryError):
+            self.system.register_student(
+                name="Alice",
+                enrolment_number="ENR-001",
+                programme="M.Sc. DFIS",
+                semester="I",
+                contact_details="alice@example.com",
+            )
+        with self.assertRaises(InventoryError):
+            self.system.add_inventory_item(
+                code="USB-CBL",
+                name="USB Cable",
+                category="Cable",
+                description="Reusable cable",
+                make_model="Type-C",
+                total_quantity=20,
+                tracking_type="quantity",
+            )
+        with self.assertRaises(InventoryError):
+            self.system.add_asset(
+                asset_id="DB-001",
+                item_code="DB",
+                serial_number="SER-001",
+                location="Lab A",
+            )
+
+    def test_due_date_boundary_is_not_overdue_on_due_date(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=1,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 1),
+        )
+        overdue = self.system.get_overdue_items(as_of_date=issue.due_date)
+        self.assertEqual(overdue, [])
+
+    def test_transaction_history_filtering_and_ordering(self) -> None:
+        issue = self.system.issue_item(
+            student_enrolment="ENR-001",
+            item_code="USB-CBL",
+            quantity=2,
+            purpose="Lab work",
+            issuing_staff="coord",
+            issue_date=date(2026, 10, 1),
+        )
+        self.system.record_return(
+            issue_id=issue.issue_id,
+            quantity_returned=1,
+            condition_on_return="usable",
+            receiving_staff="coord",
+            return_date=date(2026, 10, 5),
+        )
+        self.system.request_renewal(
+            issue_id=issue.issue_id,
+            request_date=date(2026, 10, 6),
+            requested_by="ENR-001",
+        )
+        history = self.system.get_transaction_history(
+            start_date=date(2026, 10, 1),
+            end_date=date(2026, 10, 6),
+            item_code="USB-CBL",
+            student_enrolment="ENR-001",
+        )
+        self.assertEqual([event["type"] for event in history], ["issue", "return", "renewal_requested"])
+        with self.assertRaises(InventoryError):
+            self.system.get_transaction_history(
+                start_date=date(2026, 10, 7),
+                end_date=date(2026, 10, 6),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

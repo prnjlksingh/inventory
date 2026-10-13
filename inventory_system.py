@@ -9,8 +9,36 @@ class InventoryError(ValueError):
     """Raised when an inventory operation violates a business rule."""
 
 
+class StudentValidationError(InventoryError):
+    """Raised when student data or lookups are invalid."""
+
+
+class ItemValidationError(InventoryError):
+    """Raised when inventory item data or lookups are invalid."""
+
+
+class AssetValidationError(InventoryError):
+    """Raised when asset operations are invalid."""
+
+
+class IssueValidationError(InventoryError):
+    """Raised when issue operations are invalid."""
+
+
+class ReturnValidationError(InventoryError):
+    """Raised when return operations are invalid."""
+
+
+class RenewalValidationError(InventoryError):
+    """Raised when renewal operations are invalid."""
+
+
+class StockIntegrityError(InventoryError):
+    """Raised when stock adjustments violate invariants."""
+
+
 USABLE = "usable"
-UNUSABLE_CONDITIONS = {"damaged", "lost", "maintenance"}
+UNUSABLE_CONDITIONS = {"damaged", "lost", "maintenance", "retired"}
 
 
 @dataclass
@@ -85,6 +113,8 @@ class IssueRecord:
 
 
 class DepartmentInventorySystem:
+    """In-memory domain service for department inventory issue workflows."""
+
     def __init__(self) -> None:
         self.students: Dict[str, Student] = {}
         self.items: Dict[str, InventoryItem] = {}
@@ -107,6 +137,10 @@ class DepartmentInventorySystem:
         semester: str,
         contact_details: str,
     ) -> None:
+        if not enrolment_number:
+            raise StudentValidationError("enrolment_number is required.")
+        if enrolment_number in self.students:
+            raise StudentValidationError(f"Student {enrolment_number} is already registered.")
         self.students[enrolment_number] = Student(
             name=name,
             enrolment_number=enrolment_number,
@@ -126,9 +160,11 @@ class DepartmentInventorySystem:
         tracking_type: str = "quantity",
     ) -> None:
         if total_quantity < 0:
-            raise InventoryError("Total quantity cannot be negative.")
+            raise ItemValidationError("Total quantity cannot be negative.")
         if tracking_type not in {"quantity", "asset"}:
-            raise InventoryError("tracking_type must be either 'quantity' or 'asset'.")
+            raise ItemValidationError("tracking_type must be either 'quantity' or 'asset'.")
+        if code in self.items:
+            raise ItemValidationError(f"Item {code} already exists.")
         self.items[code] = InventoryItem(
             code=code,
             name=name,
@@ -149,9 +185,16 @@ class DepartmentInventorySystem:
     ) -> None:
         item = self._require_item(item_code)
         if item.tracking_type != "asset":
-            raise InventoryError("Assets can only be added for asset-tracked items.")
+            raise AssetValidationError("Assets can only be added for asset-tracked items.")
         if condition not in {USABLE, *UNUSABLE_CONDITIONS}:
-            raise InventoryError("Invalid condition.")
+            raise AssetValidationError("Invalid asset condition.")
+        if asset_id in self.assets:
+            raise AssetValidationError(f"Asset {asset_id} already exists.")
+        if any(
+            existing.item_code == item_code and existing.serial_number == serial_number
+            for existing in self.assets.values()
+        ):
+            raise AssetValidationError("Duplicate serial number for the same item.")
         if location:
             self.storage_locations.add(location)
         self.assets[asset_id] = Asset(
@@ -176,27 +219,28 @@ class DepartmentInventorySystem:
         self._require_student(student_enrolment)
 
         issue_date = issue_date or date.today()
+        self._ensure_date(issue_date, "issue_date")
         due_date = issue_date + timedelta(days=15)
 
         if quantity <= 0:
-            raise InventoryError("Issued quantity must be positive.")
+            raise IssueValidationError("Issued quantity must be positive.")
 
         limit = self.issue_limits.get(item_code)
         if limit is not None and quantity > limit:
-            raise InventoryError(f"Issue limit exceeded for {item_code}.")
+            raise IssueValidationError(f"Issue limit exceeded for {item_code}.")
 
         if item.tracking_type == "asset":
             if quantity != 1:
-                raise InventoryError("Asset-tracked items can only be issued in quantity 1.")
+                raise IssueValidationError("Asset-tracked items can only be issued in quantity 1.")
             if not asset_id:
-                raise InventoryError("Asset ID is required for asset-tracked issue.")
+                raise IssueValidationError("Asset ID is required for asset-tracked issue.")
             asset = self._require_asset(asset_id, item_code)
             if not asset.is_issuable:
-                raise InventoryError("Asset is unavailable for issue.")
+                raise IssueValidationError("Asset is unavailable for issue.")
         else:
             available = self.get_available_quantity(item_code)
             if quantity > available:
-                raise InventoryError(
+                raise IssueValidationError(
                     f"{quantity} requested but only {available} currently available."
                 )
 
@@ -228,14 +272,20 @@ class DepartmentInventorySystem:
         )
         self.issues[issue_id] = record
         self._log_event("issue", issue_date, issuing_staff, issue_id, item_code, {"quantity": quantity})
+        self._assert_item_stock_consistency(item_code)
         return record
 
     def request_renewal(
         self, issue_id: str, request_date: date, requested_by: str, remarks: str = ""
     ) -> None:
         issue = self._require_issue(issue_id)
+        self._ensure_date(request_date, "request_date")
         if issue.is_closed:
-            raise InventoryError("Cannot renew a fully returned issue.")
+            raise RenewalValidationError("Cannot renew a fully returned issue.")
+        if request_date < issue.issue_date:
+            raise RenewalValidationError("Renewal request date cannot be before issue date.")
+        if issue.renewal_status == "requested":
+            raise RenewalValidationError("A renewal request is already pending review.")
         issue.renewal_status = "requested"
         issue.history.append(
             {
@@ -263,15 +313,21 @@ class DepartmentInventorySystem:
         remarks: str = "",
     ) -> None:
         issue = self._require_issue(issue_id)
+        self._ensure_date(approval_date, "approval_date")
         if issue.is_closed:
-            raise InventoryError("Cannot review renewal for a closed issue.")
+            raise RenewalValidationError("Cannot review renewal for a closed issue.")
         if approval_status not in {"approved", "rejected"}:
-            raise InventoryError("approval_status must be either 'approved' or 'rejected'.")
+            raise RenewalValidationError("approval_status must be either 'approved' or 'rejected'.")
+        if issue.renewal_status != "requested":
+            raise RenewalValidationError("Renewal review requires a prior pending request.")
+        requested_on = self._latest_history_date(issue, "renewal_requested")
+        if requested_on and approval_date < requested_on:
+            raise RenewalValidationError("Renewal approval date cannot be before request date.")
 
         if approval_status == "approved":
             limit = self.renewal_limits.get(issue.item_code)
             if limit is not None and issue.renewal_count >= limit:
-                raise InventoryError("Renewal limit exceeded.")
+                raise RenewalValidationError("Renewal limit exceeded.")
             issue.due_date = issue.due_date + timedelta(days=15)
             issue.renewal_count += 1
 
@@ -306,21 +362,28 @@ class DepartmentInventorySystem:
         issue = self._require_issue(issue_id)
         item = self._require_item(issue.item_code)
         return_date = return_date or date.today()
+        self._ensure_date(return_date, "return_date")
 
         if quantity_returned <= 0:
-            raise InventoryError("Returned quantity must be positive.")
+            raise ReturnValidationError("Returned quantity must be positive.")
+        if issue.is_closed:
+            raise ReturnValidationError("Issue is already fully returned.")
         if quantity_returned > issue.outstanding_quantity:
-            raise InventoryError("Returned quantity exceeds outstanding quantity.")
+            raise ReturnValidationError("Returned quantity exceeds outstanding quantity.")
         if condition_on_return not in {USABLE, *UNUSABLE_CONDITIONS}:
-            raise InventoryError("Invalid return condition.")
+            raise ReturnValidationError("Invalid return condition.")
+        if return_date < issue.issue_date:
+            raise ReturnValidationError("Return date cannot be before issue date.")
 
         if item.tracking_type == "asset" and quantity_returned != 1:
-            raise InventoryError("Asset returns must be for quantity 1.")
+            raise ReturnValidationError("Asset returns must be for quantity 1.")
 
         issue.outstanding_quantity -= quantity_returned
 
         if item.tracking_type == "asset":
             asset = self._require_asset(issue.asset_id, issue.item_code)
+            if asset.issued_to_issue_id != issue_id:
+                raise ReturnValidationError("Asset is not issued against this issue record.")
             asset.issued_to_issue_id = None
             asset.condition = condition_on_return
         else:
@@ -353,6 +416,7 @@ class DepartmentInventorySystem:
                 "outstanding_quantity": issue.outstanding_quantity,
             },
         )
+        self._assert_item_stock_consistency(issue.item_code)
 
     def update_asset_condition(
         self,
@@ -363,7 +427,9 @@ class DepartmentInventorySystem:
     ) -> None:
         asset = self._require_asset(asset_id)
         if condition not in {USABLE, *UNUSABLE_CONDITIONS}:
-            raise InventoryError("Invalid condition.")
+            raise AssetValidationError("Invalid asset condition.")
+        if asset.is_issued and condition != USABLE:
+            raise AssetValidationError("Issued assets cannot move to non-usable states directly.")
         asset.condition = condition
         self._log_event(
             "asset_condition_updated",
@@ -383,11 +449,19 @@ class DepartmentInventorySystem:
         adjustment_date: Optional[date] = None,
     ) -> None:
         item = self._require_item(item_code)
+        self._ensure_date(adjustment_date, "adjustment_date", allow_none=True)
+        if quantity_delta == 0:
+            raise StockIntegrityError("quantity_delta cannot be zero.")
+        if item.tracking_type == "asset":
+            raise StockIntegrityError(
+                "Stock adjustment is unsupported for asset-tracked items; use asset workflows."
+            )
         if item.total_quantity + quantity_delta < item.unavailable_quantity():
-            raise InventoryError("Adjustment would make stock inconsistent.")
+            raise StockIntegrityError("Adjustment would make stock inconsistent.")
         if self.get_issued_quantity(item_code) > item.total_quantity + quantity_delta - item.unavailable_quantity():
-            raise InventoryError("Adjustment would drop below currently issued quantity.")
+            raise StockIntegrityError("Adjustment would drop below currently issued quantity.")
         item.total_quantity += quantity_delta
+        self._assert_item_stock_consistency(item_code)
         self._log_event(
             "stock_adjustment",
             adjustment_date or date.today(),
@@ -407,10 +481,13 @@ class DepartmentInventorySystem:
     ) -> None:
         item = self._require_item(item_code)
         if quantity <= 0:
-            raise InventoryError("Retired quantity must be positive.")
+            raise StockIntegrityError("Retired quantity must be positive.")
+        if item.tracking_type == "asset":
+            raise StockIntegrityError("Use asset condition updates to retire asset-tracked stock.")
         if quantity > self.get_available_quantity(item_code):
-            raise InventoryError("Cannot retire more than available stock.")
+            raise StockIntegrityError("Cannot retire more than available stock.")
         item.retired_quantity += quantity
+        self._assert_item_stock_consistency(item_code)
         self._log_event(
             "stock_retired",
             retirement_date or date.today(),
@@ -458,7 +535,7 @@ class DepartmentInventorySystem:
                     "issue_id": issue.issue_id,
                 }
             )
-        return overdue
+        return sorted(overdue, key=lambda entry: (entry["due_date"], entry["issue_id"]))
 
     def get_upcoming_due_items(
         self, as_of_date: Optional[date] = None, within_days: int = 3
@@ -479,7 +556,7 @@ class DepartmentInventorySystem:
                         "issue_id": issue.issue_id,
                     }
                 )
-        return upcoming
+        return sorted(upcoming, key=lambda entry: (entry["due_date"], entry["issue_id"]))
 
     def get_inventory_status(self, item_code: str, as_of_date: Optional[date] = None) -> Dict[str, int]:
         item = self._require_item(item_code)
@@ -500,11 +577,13 @@ class DepartmentInventorySystem:
         }
 
     def get_student_records(self, enrolment_number: str) -> List[IssueRecord]:
-        return [
-            issue
-            for issue in self.issues.values()
-            if issue.student_enrolment == enrolment_number
-        ]
+        return self._sorted_records(
+            [
+                issue
+                for issue in self.issues.values()
+                if issue.student_enrolment == enrolment_number
+            ]
+        )
 
     def get_programme_records(self, programme: str) -> List[IssueRecord]:
         eligible_students = {
@@ -512,14 +591,16 @@ class DepartmentInventorySystem:
             for student in self.students.values()
             if student.programme == programme
         }
-        return [
-            issue
-            for issue in self.issues.values()
-            if issue.student_enrolment in eligible_students
-        ]
+        return self._sorted_records(
+            [
+                issue
+                for issue in self.issues.values()
+                if issue.student_enrolment in eligible_students
+            ]
+        )
 
     def get_item_records(self, item_code: str) -> List[IssueRecord]:
-        return [issue for issue in self.issues.values() if issue.item_code == item_code]
+        return self._sorted_records([issue for issue in self.issues.values() if issue.item_code == item_code])
 
     def get_lab_records(self, location: str) -> List[IssueRecord]:
         item_codes = {
@@ -527,7 +608,67 @@ class DepartmentInventorySystem:
             for asset in self.assets.values()
             if asset.location == location
         }
-        return [issue for issue in self.issues.values() if issue.item_code in item_codes]
+        return self._sorted_records([issue for issue in self.issues.values() if issue.item_code in item_codes])
+
+    def get_transaction_history(
+        self,
+        *,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
+        event_type: Optional[str] = None,
+        item_code: Optional[str] = None,
+        student_enrolment: Optional[str] = None,
+    ) -> List[Dict[str, object]]:
+        """Return transaction events with deterministic ordering and optional filters."""
+
+        self._ensure_date(start_date, "start_date", allow_none=True)
+        self._ensure_date(end_date, "end_date", allow_none=True)
+        if start_date and end_date and start_date > end_date:
+            raise InventoryError("start_date cannot be after end_date.")
+
+        events: List[Dict[str, object]] = []
+        for event in self.transaction_log:
+            if start_date and event["date"] < start_date:
+                continue
+            if end_date and event["date"] > end_date:
+                continue
+            if event_type and event["type"] != event_type:
+                continue
+            if item_code and event["item_code"] != item_code:
+                continue
+            if student_enrolment:
+                issue_id = event.get("issue_id")
+                issue = self.issues.get(issue_id) if issue_id else None
+                if not issue or issue.student_enrolment != student_enrolment:
+                    continue
+            events.append(event)
+        return sorted(events, key=lambda entry: (entry["date"], entry["type"], entry.get("issue_id") or ""))
+
+    def _sorted_records(self, records: List[IssueRecord]) -> List[IssueRecord]:
+        return sorted(records, key=lambda issue: (issue.issue_date, issue.issue_id))
+
+    def _assert_item_stock_consistency(self, item_code: str) -> None:
+        item = self._require_item(item_code)
+        if item.tracking_type == "asset":
+            return
+        issued = self.get_issued_quantity(item_code)
+        unavailable = item.unavailable_quantity()
+        if issued < 0 or unavailable < 0:
+            raise StockIntegrityError("Stock values cannot be negative.")
+        if issued + unavailable > item.total_quantity:
+            raise StockIntegrityError("Issued + unavailable stock cannot exceed total stock.")
+
+    def _ensure_date(self, value: Optional[date], field_name: str, allow_none: bool = False) -> None:
+        if value is None and allow_none:
+            return
+        if not isinstance(value, date):
+            raise InventoryError(f"{field_name} must be a date instance.")
+
+    def _latest_history_date(self, issue: IssueRecord, event_type: str) -> Optional[date]:
+        dates = [entry["date"] for entry in issue.history if entry.get("type") == event_type]
+        if not dates:
+            return None
+        return max(dates)
 
     def _next_issue_id(self) -> str:
         self._issue_sequence += 1
@@ -536,29 +677,29 @@ class DepartmentInventorySystem:
     def _require_student(self, enrolment_number: str) -> Student:
         student = self.students.get(enrolment_number)
         if not student:
-            raise InventoryError("Items can be issued only to registered students.")
+            raise StudentValidationError("Items can be issued only to registered students.")
         return student
 
     def _require_item(self, item_code: str) -> InventoryItem:
         item = self.items.get(item_code)
         if not item:
-            raise InventoryError("Unknown inventory item.")
+            raise ItemValidationError("Unknown inventory item.")
         return item
 
     def _require_asset(self, asset_id: Optional[str], expected_item_code: Optional[str] = None) -> Asset:
         if not asset_id:
-            raise InventoryError("Asset ID is required.")
+            raise AssetValidationError("Asset ID is required.")
         asset = self.assets.get(asset_id)
         if not asset:
-            raise InventoryError("Unknown asset.")
+            raise AssetValidationError("Unknown asset.")
         if expected_item_code and asset.item_code != expected_item_code:
-            raise InventoryError("Asset does not belong to requested item.")
+            raise AssetValidationError("Asset does not belong to requested item.")
         return asset
 
     def _require_issue(self, issue_id: str) -> IssueRecord:
         issue = self.issues.get(issue_id)
         if not issue:
-            raise InventoryError("Unknown issue record.")
+            raise IssueValidationError("Unknown issue record.")
         return issue
 
     def _log_event(
