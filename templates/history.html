@@ -1,25 +1,76 @@
 {% extends "base.html" %}
+{% block title %}Custody Audit Trail & History{% endblock %}
+
 {% block content %}
-<h2 class="page-title">Transaction History</h2>
-<section class="panel">
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Custody & Transaction Audit Trail</h1>
+    <p class="page-subtitle">Immutable chronological ledger of every checkout, check-in, maintenance transition, and inventory adjustment.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('export_transactions_csv') }}" class="btn btn-outline">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Export Audit Trail CSV
+    </a>
+  </div>
+</div>
+
+<div class="panel">
   {% if events %}
-    <table>
-      <thead><tr><th>Date</th><th>Type</th><th>Issue</th><th>Item</th><th>Responsible User</th><th>Details</th></tr></thead>
-      <tbody>
-      {% for event in events|reverse %}
-        <tr>
-          <td>{{ event.date }}</td>
-          <td>{{ event.type.replace('_', ' ') }}</td>
-          <td>{{ event.issue_id or '-' }}</td>
-          <td>{{ event.item_code or '-' }}</td>
-          <td>{{ event.responsible_user }}</td>
-          <td>{{ event.details }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Event Action</th>
+            <th>Issue ID</th>
+            <th>Equipment Code</th>
+            <th>Responsible User</th>
+            <th>Details Payload</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for event in events|reverse %}
+          <tr>
+            <td style="font-size:0.84rem; color:var(--text-muted); font-family:monospace;">{{ event.date }}</td>
+            <td>
+              {% if 'issue' in event.type %}
+                <span class="badge badge-info">{{ event.type.replace('_', ' ') }}</span>
+              {% elif 'return' in event.type %}
+                <span class="badge badge-success">{{ event.type.replace('_', ' ') }}</span>
+              {% elif 'maintenance' in event.type %}
+                <span class="badge badge-warn">{{ event.type.replace('_', ' ') }}</span>
+              {% else %}
+                <span class="badge badge-neutral">{{ event.type.replace('_', ' ') }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if event.issue_id %}
+                <a href="{{ url_for('issue_receipt', issue_id=event.issue_id) }}" style="color:var(--primary); font-weight:600; text-decoration:none;" title="Print Receipt">
+                  <code>{{ event.issue_id }}</code>
+                </a>
+              {% else %}
+                <span style="color:var(--text-muted);">-</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if event.item_code %}
+                <strong>{{ event.item_code }}</strong>
+              {% else %}
+                <span style="color:var(--text-muted);">-</span>
+              {% endif %}
+            </td>
+            <td style="font-size:0.85rem; font-weight:600;">{{ event.responsible_user }}</td>
+            <td style="font-size:0.8rem; color:var(--text-secondary); max-width:280px; word-break:break-word;">
+              {{ event.details }}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p class="empty">No transactions recorded yet.</p>
+    <p style="color:var(--text-muted); font-style:italic; padding:2rem 0; text-align:center;">No audit transactions recorded yet.</p>
   {% endif %}
-</section>
+</div>
 {% endblock %}

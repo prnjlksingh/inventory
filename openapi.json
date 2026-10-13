@@ -1,0 +1,228 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "National Forensic Sciences University (NFSU) - Central Lab Inventory & Evidence API",
+    "version": "2.0.0",
+    "description": "Official REST API for inventory.nfsu.ac.in supporting digital forensics write blockers, comparison microscopes, evidence seizure kits, lab bookings, and ISO/IEC 17025 custody tracking."
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+      "description": "API v1 Endpoint"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "System Health Status",
+        "responses": {
+          "200": { "description": "System is operational" }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Executive metrics & utilization statistics",
+        "responses": {
+          "200": { "description": "Analytics summary payload" }
+        }
+      }
+    },
+    "/items": {
+      "get": {
+        "summary": "List inventory items with stock levels",
+        "parameters": [
+          { "name": "q", "in": "query", "schema": { "type": "string" }, "description": "Search code or name" },
+          { "name": "category", "in": "query", "schema": { "type": "string" }, "description": "Filter by category" }
+        ],
+        "responses": {
+          "200": { "description": "List of inventory items" }
+        }
+      },
+      "post": {
+        "summary": "Register new inventory item",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["code", "name", "category", "total_quantity"],
+                "properties": {
+                  "code": { "type": "string" },
+                  "name": { "type": "string" },
+                  "category": { "type": "string" },
+                  "description": { "type": "string" },
+                  "make_model": { "type": "string" },
+                  "total_quantity": { "type": "integer" },
+                  "tracking_type": { "type": "string", "enum": ["quantity", "asset"] }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Item created" },
+          "400": { "description": "Validation error" }
+        }
+      }
+    },
+    "/items/{code}": {
+      "get": {
+        "summary": "Get item details and individual serialized assets",
+        "parameters": [
+          { "name": "code", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Item details" },
+          "404": { "description": "Item not found" }
+        }
+      }
+    },
+    "/assets": {
+      "get": {
+        "summary": "List physical serialized assets",
+        "parameters": [
+          { "name": "item_code", "in": "query", "schema": { "type": "string" } },
+          { "name": "condition", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of assets" }
+        }
+      },
+      "post": {
+        "summary": "Register a new serialized asset",
+        "responses": {
+          "201": { "description": "Asset registered" }
+        }
+      }
+    },
+    "/students": {
+      "get": {
+        "summary": "List registered students",
+        "responses": {
+          "200": { "description": "Student roster" }
+        }
+      },
+      "post": {
+        "summary": "Register new student",
+        "responses": {
+          "201": { "description": "Student registered" }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "summary": "Perform single item checkout",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["student_enrolment", "item_code", "quantity"],
+                "properties": {
+                  "student_enrolment": { "type": "string" },
+                  "item_code": { "type": "string" },
+                  "quantity": { "type": "integer" },
+                  "purpose": { "type": "string" },
+                  "issuing_staff": { "type": "string" },
+                  "asset_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Issue record created" }
+        }
+      }
+    },
+    "/checkin": {
+      "post": {
+        "summary": "Record item return",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["issue_id", "quantity_returned", "condition_on_return"],
+                "properties": {
+                  "issue_id": { "type": "string" },
+                  "quantity_returned": { "type": "integer" },
+                  "condition_on_return": { "type": "string" },
+                  "receiving_staff": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Return recorded" }
+        }
+      }
+    },
+    "/kits": {
+      "get": {
+        "summary": "List bundle kits and real-time kit availability",
+        "responses": {
+          "200": { "description": "List of kits" }
+        }
+      },
+      "post": {
+        "summary": "Define a new bundle kit",
+        "responses": {
+          "201": { "description": "Kit created" }
+        }
+      }
+    },
+    "/kits/checkout": {
+      "post": {
+        "summary": "Atomic 1-click checkout of an entire multi-asset kit",
+        "responses": {
+          "201": { "description": "Kit issued" }
+        }
+      }
+    },
+    "/reservations": {
+      "get": {
+        "summary": "List gear reservations and schedule bookings",
+        "responses": {
+          "200": { "description": "List of reservations" }
+        }
+      },
+      "post": {
+        "summary": "Create equipment reservation",
+        "responses": {
+          "201": { "description": "Reservation created" }
+        }
+      }
+    },
+    "/maintenance": {
+      "get": {
+        "summary": "List equipment repair and maintenance records",
+        "responses": {
+          "200": { "description": "List of maintenance work orders" }
+        }
+      },
+      "post": {
+        "summary": "Create maintenance work order",
+        "responses": {
+          "201": { "description": "Work order created" }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Instant universal search across items, assets, students, and issues",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Search matches" }
+        }
+      }
+    }
+  }
+}

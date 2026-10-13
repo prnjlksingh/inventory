@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Fleet Analytics & Equipment Intelligence{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Fleet Analytics & Intelligence</h1>
+    <p class="page-subtitle">Equipment utilization metrics, category capacity, and borrower frequency analytics.</p>
+  </div>
+  <div style="display:flex; gap:0.5rem;">
+    <a href="{{ url_for('export_inventory_csv') }}" class="btn btn-outline btn-sm">Export Inventory CSV</a>
+    <a href="{{ url_for('export_transactions_csv') }}" class="btn btn-outline btn-sm">Export Audit Trail CSV</a>
+  </div>
+</div>
+
+<div class="cards-grid">
+  <div class="stat-card c-primary">
+    <div class="stat-card-label">Fleet Utilization</div>
+    <div class="stat-card-value">{{ analytics.utilization_rate }}%</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">{{ analytics.total_issued }} of {{ analytics.total_units }} units in field</div>
+  </div>
+  <div class="stat-card c-success">
+    <div class="stat-card-label">Stock Availability</div>
+    <div class="stat-card-value">{{ analytics.total_available }}</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">Units ready on shelves</div>
+  </div>
+  <div class="stat-card c-danger">
+    <div class="stat-card-label">Overdue Risk Units</div>
+    <div class="stat-card-value" style="color:var(--danger);">{{ analytics.total_overdue }}</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">Active delinquent issues</div>
+  </div>
+  <div class="stat-card c-info">
+    <div class="stat-card-label">Catalog SKUs</div>
+    <div class="stat-card-value">{{ analytics.total_items_count }}</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">Distinct equipment models</div>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(420px, 1fr)); gap:1.25rem;">
+  <!-- CATEGORY DISTRIBUTION -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Equipment Fleet by Category</div>
+    </div>
+    <div>
+      {% for cat, count in analytics.category_distribution.items() %}
+        {% set pct = (count / analytics.total_units * 100)|round(1) if analytics.total_units > 0 else 0 %}
+        <div style="margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.86rem; margin-bottom:0.25rem;">
+            <span><strong>{{ cat }}</strong></span>
+            <span style="color:var(--text-muted);">{{ count }} units ({{ pct }}%)</span>
+          </div>
+          <div style="height:8px; background:#e2e8f0; border-radius:999px; overflow:hidden;">
+            <div style="height:100%; width:{{ pct }}%; background:linear-gradient(90deg, #002147, #ddb55e); border-radius:999px;"></div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- TOP BORROWED EQUIPMENT -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Highest Velocity Equipment (Checkouts)</div>
+    </div>
+    {% if analytics.top_items %}
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Equipment Model</th>
+              <th>Total Checkouts</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for it in analytics.top_items %}
+            <tr>
+              <td>
+                <strong>{{ it.code }}</strong><br>
+                <span style="font-size:0.8rem; color:var(--text-muted);">{{ it.name }}</span>
+              </td>
+              <td><span class="badge badge-info">{{ it.count }} checkouts</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color:var(--text-muted); font-style:italic;">No checkouts recorded yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- TOP STUDENT BORROWERS -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Most Active Student Borrowers</div>
+    </div>
+    {% if analytics.top_borrowers %}
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Total Checkouts</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for b in analytics.top_borrowers %}
+            <tr>
+              <td>
+                <a href="{{ url_for('student_detail', enrolment=b.enrolment) }}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+                  {{ b.name }}
+                </a><br>
+                <code style="font-size:0.78rem; color:var(--text-muted);">{{ b.enrolment }}</code>
+              </td>
+              <td><span class="badge badge-success">{{ b.count }} items issued</span></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color:var(--text-muted); font-style:italic;">No student activity yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

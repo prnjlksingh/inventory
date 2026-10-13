@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Register Student{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Register New Student Borrower</h1>
+    <p class="page-subtitle">Add student records for equipment checkout permissions and custody tracking.</p>
+  </div>
+</div>
+
+<div class="panel" style="max-width:680px;">
+  <form method="post">
+    <div class="form-grid" style="margin-bottom:1.25rem;">
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" name="name" placeholder="e.g. Maya Patel" required>
+      </div>
+
+      <div class="form-group">
+        <label for="enrolment_number">Enrolment / Student ID *</label>
+        <input type="text" id="enrolment_number" name="enrolment_number" placeholder="e.g. ENR-008" required>
+      </div>
+
+      <div class="form-group">
+        <label for="programme">Degree Programme *</label>
+        <input type="text" id="programme" name="programme" placeholder="e.g. B.Tech Computer Science" required>
+      </div>
+
+      <div class="form-group">
+        <label for="semester">Current Semester *</label>
+        <input type="text" id="semester" name="semester" placeholder="e.g. IV" value="I" required>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label for="contact_details">Contact Email / Phone *</label>
+      <input type="text" id="contact_details" name="contact_details" placeholder="e.g. maya@campus.edu / +1 555-0192" required>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+      <a href="{{ url_for('students_list') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Register Student</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

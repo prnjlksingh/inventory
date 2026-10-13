@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NFSU Central Laboratory REST API | inventory.nfsu.ac.in</title>
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+    <style>
+      body { margin: 0; padding: 0; background: #fafafa; font-family: -apple-system, system-ui, sans-serif; }
+      .swagger-ui .topbar { display: none; }
+      .govt-tricolor { height: 4px; background: linear-gradient(90deg, #ff9933 0%, #ff9933 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%, #138808 100%); width: 100%; }
+      .custom-header {
+        background: #002147;
+        border-bottom: 3px solid #ddb55e;
+        color: #fff;
+        padding: 0.8rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .custom-header a {
+        color: #ddb55e;
+        text-decoration: none;
+        font-size: 0.88rem;
+        font-weight: 600;
+      }
+      .custom-header a:hover { color: #fff; }
+    </style>
+  </head>
+  <body>
+    <div class="govt-tricolor"></div>
+    <div class="custom-header">
+      <div style="display:flex; align-items:center;">
+        <img src="/static/nfsu_logo.png" alt="NFSU Logo" style="height:44px; margin-right:14px;">
+        <div>
+          <strong style="font-size:1.05rem; color:#fff;">National Forensic Sciences University (NFSU)</strong> &bull; Central Lab REST API (OpenAPI 3.0)<br>
+          <span style="font-size:0.78rem; color:#cbd5e1;">An Institution of National Importance &bull; Ministry of Home Affairs, Govt. of India &bull; <code>inventory.nfsu.ac.in</code></span>
+        </div>
+      </div>
+      <div>
+        <a href="/">&larr; Return to Central Portal</a>
+      </div>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+    <script>
+      window.onload = () => {
+        window.ui = SwaggerUIBundle({
+          url: '/api/openapi.json',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIBundle.SwaggerUIStandalonePreset
+          ],
+          layout: "BaseLayout"
+        });
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Equipment Reservations & Bookings{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Equipment Reservations & Schedule</h1>
+    <p class="page-subtitle">Advance booking pipeline with double-booking prevention and 1-click fulfillment.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('add_reservation') }}" class="btn btn-primary">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      New Reservation
+    </a>
+  </div>
+</div>
+
+<div class="panel">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+    <div style="display:flex; gap:0.4rem;">
+      <a href="{{ url_for('reservations_list') }}" class="btn btn-sm {{ 'btn-primary' if not status_filter else 'btn-outline' }}">All Bookings</a>
+      <a href="{{ url_for('reservations_list', status='approved') }}" class="btn btn-sm {{ 'btn-primary' if status_filter == 'approved' else 'btn-outline' }}">Approved</a>
+      <a href="{{ url_for('reservations_list', status='fulfilled') }}" class="btn btn-sm {{ 'btn-primary' if status_filter == 'fulfilled' else 'btn-outline' }}">Fulfilled</a>
+      <a href="{{ url_for('reservations_list', status='cancelled') }}" class="btn btn-sm {{ 'btn-primary' if status_filter == 'cancelled' else 'btn-outline' }}">Cancelled</a>
+    </div>
+  </div>
+
+  {% if reservations %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Student</th>
+            <th>Item Code</th>
+            <th>Quantity</th>
+            <th>Schedule Window</th>
+            <th>Purpose / Notes</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in reservations %}
+          <tr>
+            <td><code>{{ r.reservation_id }}</code></td>
+            <td>
+              <a href="{{ url_for('student_detail', enrolment=r.student_enrolment) }}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+                {{ r.student_enrolment }}
+              </a>
+            </td>
+            <td><strong>{{ r.item_code }}</strong></td>
+            <td><span class="badge badge-neutral">{{ r.quantity }}</span></td>
+            <td>
+              <span style="font-size:0.84rem; font-weight:600;">{{ r.start_date }}</span>
+              <span style="color:var(--text-muted); font-size:0.8rem;"> to </span>
+              <span style="font-size:0.84rem; font-weight:600;">{{ r.end_date }}</span>
+            </td>
+            <td>
+              <div>{{ r.purpose }}</div>
+              {% if r.notes %}
+                <small style="color:var(--text-muted);">{{ r.notes }}</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.status == 'approved' %}
+                <span class="badge badge-success">Approved</span>
+              {% elif r.status == 'fulfilled' %}
+                <span class="badge badge-info">Fulfilled (Checked Out)</span>
+              {% elif r.status == 'cancelled' %}
+                <span class="badge badge-neutral">Cancelled</span>
+              {% else %}
+                <span class="badge badge-warn">{{ r.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              <div style="display:flex; gap:0.35rem;">
+                {% if r.status in ['approved', 'pending'] %}
+                  <form method="post" action="{{ url_for('fulfill_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-primary btn-sm">Fulfill</button>
+                  </form>
+                  <form method="post" action="{{ url_for('cancel_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-outline btn-sm" style="color:#dc2626;" onclick="return confirm('Cancel this reservation?');">Cancel</button>
+                  </form>
+                {% else %}
+                  <span style="color:var(--text-muted); font-size:0.8rem;">Closed</span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:var(--text-muted); font-style:italic; padding:2rem 0; text-align:center;">No gear reservations found.</p>
+  {% endif %}
+</div>
+{% endblock %}

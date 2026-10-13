@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Log Maintenance Work Order{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Log Equipment Service & Repair Order</h1>
+    <p class="page-subtitle">Temporarily remove hardware from available pool while undergoing calibration or repair.</p>
+  </div>
+</div>
+
+<div class="panel" style="max-width:680px;">
+  <form method="post">
+    <div class="form-grid" style="margin-bottom:1.25rem;">
+      <div class="form-group">
+        <label for="item_code">Item Code *</label>
+        <select id="item_code" name="item_code" required onchange="handleItemSelect(this)">
+          <option value="">Select item...</option>
+          {% for it in items %}
+            <option value="{{ it.code }}" data-tracking="{{ it.tracking_type }}">{{ it.code }} — {{ it.name }} ({{ it.tracking_type }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="asset_id">Serialized Asset ID (if asset-tracked)</label>
+        <select id="asset_id" name="asset_id">
+          <option value="">None / Quantity item</option>
+          {% for a in assets %}
+            <option value="{{ a.asset_id }}" data-item="{{ a.item_code }}">{{ a.asset_id }} ({{ a.item_code }} — SN: {{ a.serial_number }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="technician">Service Center / Technician *</label>
+        <input type="text" id="technician" name="technician" placeholder="e.g. Campus Tech Shop, Canon Lab" required>
+      </div>
+
+      <div class="form-group">
+        <label for="cost">Estimated Repair Cost ($)</label>
+        <input type="number" id="cost" name="cost" step="0.01" value="0.00">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.25rem;">
+      <label for="title">Service Order Title *</label>
+      <input type="text" id="title" name="title" placeholder="e.g. Lens Calibration, Sensor Cleaning, Cable Re-terminating" required>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label for="issue_description">Fault / Issue Details *</label>
+      <textarea id="issue_description" name="issue_description" placeholder="Describe symptoms, error codes, physical damage observed..." required></textarea>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+      <a href="{{ url_for('maintenance_list') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Create Work Order</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function handleItemSelect(sel) {
+    const code = sel.value;
+    const assetSelect = document.getElementById('asset_id');
+    const options = assetSelect.querySelectorAll('option');
+    options.forEach(opt => {
+      if (!opt.value) return;
+      if (opt.getAttribute('data-item') === code) {
+        opt.style.display = 'block';
+      } else {
+        opt.style.display = 'none';
+      }
+    });
+  }
+</script>
+{% endblock %}

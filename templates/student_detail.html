@@ -1,49 +1,170 @@
 {% extends "base.html" %}
-{% block content %}
-<h2 class="page-title">{{ student.name }} ({{ student.enrolment_number }})</h2>
-<p class="muted">{{ student.programme }} • Semester {{ student.semester }} • {{ student.contact_details }}</p>
+{% block title %}{{ student.name }} ({{ student.enrolment_number }}){% endblock %}
 
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ student.name }}</h1>
+    <p class="page-subtitle"><code>{{ student.enrolment_number }}</code> &bull; {{ student.programme }} (Semester {{ student.semester }}) &bull; {{ student.contact_details }}</p>
+  </div>
+  <div style="display:flex; gap:0.5rem;">
+    <a href="{{ url_for('students_list') }}" class="btn btn-outline btn-sm">&larr; Back to Roster</a>
+  </div>
+</div>
+
+<!-- STUDENT BADGE SUMMARY CARD -->
+<div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1.25rem; background:linear-gradient(to right, #ffffff, #f8fafc);">
+  <div style="display:flex; gap:1.25rem; align-items:center;">
+    <img src="{{ student_qr }}" alt="Student QR Token" style="width:85px; height:85px; border-radius:8px; border:1px solid #e2e8f0;">
+    <div>
+      <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Student Borrowing Account</div>
+      <h2 style="font-size:1.35rem; font-weight:800; margin:0.1rem 0;">{{ student.name }}</h2>
+      <div style="font-size:0.85rem; color:var(--text-secondary);">Enrolment ID: <strong>{{ student.enrolment_number }}</strong></div>
+    </div>
+  </div>
+  <div style="display:flex; gap:1.5rem; font-size:0.88rem;">
+    <div>
+      <div style="color:var(--text-muted); font-size:0.78rem;">Active Issues</div>
+      <div style="font-size:1.5rem; font-weight:800; color:var(--primary);">{{ outstanding|length }}</div>
+    </div>
+    <div>
+      <div style="color:var(--text-muted); font-size:0.78rem;">Lifetime Checkouts</div>
+      <div style="font-size:1.5rem; font-weight:800;">{{ records|length }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- OUTSTANDING ISSUES -->
 <section class="panel">
-  <h3>Outstanding Issues</h3>
+  <div class="panel-header">
+    <div class="panel-title">Current Outstanding Equipment in Custody</div>
+  </div>
   {% if outstanding %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Item Code</th>
+            <th>Outstanding Qty</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for record in outstanding %}
+          <tr>
+            <td><code>{{ record.issue_id }}</code></td>
+            <td><strong>{{ record.item_code }}</strong></td>
+            <td><span class="badge badge-warn">{{ record.outstanding_quantity }}</span></td>
+            <td>{{ record.due_date }}</td>
+            <td>
+              {% if record.due_date < today %}
+                <span class="badge badge-danger">OVERDUE</span>
+              {% else %}
+                <span class="badge badge-success">Active</span>
+              {% endif %}
+            </td>
+            <td>
+              <div style="display:flex; gap:0.4rem;">
+                <a href="{{ url_for('issue_receipt', issue_id=record.issue_id) }}" class="btn btn-outline btn-sm" target="_blank">
+                  Print Slip
+                </a>
+                <a href="{{ url_for('transactions') }}" class="btn btn-secondary btn-sm">
+                  Return
+                </a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0;">No active equipment currently in student custody.</p>
+  {% endif %}
+</section>
+
+<!-- RESERVATIONS -->
+{% if reservations %}
+<section class="panel">
+  <div class="panel-header">
+    <div class="panel-title">Upcoming Equipment Bookings</div>
+  </div>
+  <div class="table-responsive">
     <table>
-      <thead><tr><th>Issue</th><th>Item</th><th>Outstanding</th><th>Due date</th><th>Status</th></tr></thead>
-      <tbody>
-      {% for record in outstanding %}
+      <thead>
         <tr>
-          <td>{{ record.issue_id }}</td>
-          <td>{{ record.item_code }}</td>
-          <td>{{ record.outstanding_quantity }}</td>
-          <td>{{ record.due_date }}</td>
-          <td>
-            {% if record.due_date < today %}
-              <span class="badge danger">Overdue</span>
-            {% else %}
-              <span class="badge success">Open</span>
-            {% endif %}
-          </td>
+          <th>Booking ID</th>
+          <th>Item</th>
+          <th>Qty</th>
+          <th>Schedule</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for r in reservations %}
+        <tr>
+          <td><code>{{ r.reservation_id }}</code></td>
+          <td><strong>{{ r.item_code }}</strong></td>
+          <td>{{ r.quantity }}</td>
+          <td>{{ r.start_date }} to {{ r.end_date }}</td>
+          <td><span class="badge badge-info">{{ r.status }}</span></td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
-  {% else %}
-    <p class="empty">No outstanding issues.</p>
-  {% endif %}
+  </div>
 </section>
+{% endif %}
 
+<!-- ALL HISTORICAL ISSUE RECORDS -->
 <section class="panel">
-  <h3>All Issue Records</h3>
+  <div class="panel-header">
+    <div class="panel-title">All Historical Checkout Records</div>
+  </div>
   {% if records %}
-    <table>
-      <thead><tr><th>Issue</th><th>Item</th><th>Issued qty</th><th>Outstanding</th><th>Issued on</th><th>Due</th></tr></thead>
-      <tbody>
-      {% for record in records %}
-        <tr><td>{{ record.issue_id }}</td><td>{{ record.item_code }}</td><td>{{ record.quantity }}</td><td>{{ record.outstanding_quantity }}</td><td>{{ record.issue_date }}</td><td>{{ record.due_date }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Item Code</th>
+            <th>Initial Qty</th>
+            <th>Outstanding</th>
+            <th>Issue Date</th>
+            <th>Due Date</th>
+            <th>Receipt</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for record in records %}
+          <tr>
+            <td><code>{{ record.issue_id }}</code></td>
+            <td><strong>{{ record.item_code }}</strong></td>
+            <td>{{ record.quantity }}</td>
+            <td>
+              {% if record.outstanding_quantity == 0 %}
+                <span class="badge badge-neutral">Returned</span>
+              {% else %}
+                <span class="badge badge-warn">{{ record.outstanding_quantity }}</span>
+              {% endif %}
+            </td>
+            <td>{{ record.issue_date }}</td>
+            <td>{{ record.due_date }}</td>
+            <td>
+              <a href="{{ url_for('issue_receipt', issue_id=record.issue_id) }}" class="btn btn-outline btn-sm" target="_blank">
+                Receipt
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p class="empty">No issue records found for this student.</p>
+    <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0;">No issue records found for this student.</p>
   {% endif %}
 </section>
 {% endblock %}

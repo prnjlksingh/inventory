@@ -1,66 +1,348 @@
 {% extends "base.html" %}
+{% block title %}Central Laboratory Command Center{% endblock %}
+{% block page_title %}Central Forensic Laboratory Command Center{% endblock %}
+{% block breadcrumb_active %}Command Center{% endblock %}
+
 {% block content %}
-<h2 class="page-title">Dashboard</h2>
-<div class="cards">
-  {% for key, label in [('total','Total'),('available','Available'),('issued','Issued'),('overdue','Overdue'),('damaged','Damaged'),('lost','Lost')] %}
-    <section class="card" aria-label="{{ label }} metric">
-      <div class="muted">{{ label }}</div>
-      <div class="metric">{{ metrics[key] }}</div>
-    </section>
-  {% endfor %}
+<!-- Quick Action Toolbar -->
+<div class="row" style="margin-bottom: 25px;">
+    <div class="col-md-8 col-sm-12">
+        <h2 style="color: #002147; font-size: 22px; font-weight: 700; margin: 0 0 6px 0;">
+            <i class="fas fa-university" style="color: #ddb55e; margin-right: 8px;"></i> National Forensic Asset & Evidence Ledger
+        </h2>
+        <p style="color: #64748b; font-size: 13.5px; margin: 0;">
+            Central Laboratory Telemetry &bull; <code>inventory.nfsu.ac.in</code> &bull; SCSDF, SFS, SBF, SET Laboratories
+        </p>
+    </div>
+    <div class="col-md-4 col-sm-12 text-right" style="margin-top: 8px;">
+        <a href="{{ url_for('transactions') }}" class="btn btn-nfsu-gold" style="margin-right: 6px;">
+            <i class="fas fa-exchange-alt"></i> New Custody Issue
+        </a>
+        <a href="{{ url_for('add_reservation') }}" class="btn btn-nfsu-primary" style="margin-right: 6px;">
+            <i class="fas fa-calendar-check"></i> Reserve
+        </a>
+        <a href="{{ url_for('kits_list') }}" class="btn btn-nfsu-outline">
+            <i class="fas fa-briefcase"></i> Kits
+        </a>
+    </div>
 </div>
 
-<section class="panel">
-  <h3>Recent Activity</h3>
-  {% if recent_activity %}
-    <table>
-      <thead><tr><th>Date</th><th>Type</th><th>Item</th><th>Issue ID</th><th>Details</th></tr></thead>
-      <tbody>
-      {% for event in recent_activity|reverse %}
-        <tr>
-          <td>{{ event.date }}</td>
-          <td>{{ event.type.replace('_', ' ') }}</td>
-          <td>{{ event.item_code or '-' }}</td>
-          <td>{{ event.issue_id or '-' }}</td>
-          <td>{{ event.details }}</td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="empty">No activity yet. Start by issuing an item.</p>
-  {% endif %}
-</section>
+<!-- 6 STAT METRIC CARDS -->
+<div class="row">
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #002147;">
+            <div class="stat-widget-content">
+                <p>Total Assets</p>
+                <h3>{{ metrics.total }}</h3>
+                <small style="color: #94a3b8; font-size: 11px;">All Schools</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #16a34a;">
+            <div class="stat-widget-content">
+                <p style="color: #16a34a;">Available</p>
+                <h3 style="color: #16a34a;">{{ metrics.available }}</h3>
+                <small style="color: #94a3b8; font-size: 11px;">In Lab Depot</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #0284c7;">
+            <div class="stat-widget-content">
+                <p style="color: #0284c7;">In Custody</p>
+                <h3 style="color: #0284c7;">{{ metrics.issued }}</h3>
+                <small style="color: #94a3b8; font-size: 11px;">Active Research</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #dc2626;">
+            <div class="stat-widget-content">
+                <p style="color: #dc2626;">Overdue</p>
+                <h3 style="color: #dc2626;">{{ metrics.overdue }}</h3>
+                <small style="color: #dc2626; font-size: 11px; font-weight: 700;">Recall Pending</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #d97706;">
+            <div class="stat-widget-content">
+                <p style="color: #d97706;">Calibration</p>
+                <h3 style="color: #d97706;">{{ metrics.damaged }}</h3>
+                <small style="color: #94a3b8; font-size: 11px;">Work Orders</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-sm-4 col-xs-6">
+        <div class="stat-widget" style="border-top: 3px solid #64748b;">
+            <div class="stat-widget-content">
+                <p>Disposed</p>
+                <h3 style="color: #64748b;">{{ metrics.lost }}</h3>
+                <small style="color: #94a3b8; font-size: 11px;">Write-offs</small>
+            </div>
+        </div>
+    </div>
+</div>
 
-<section class="panel">
-  <h3>Overdue Items</h3>
-  {% if overdue_items %}
-    <table>
-      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Overdue Days</th></tr></thead>
-      <tbody>
-      {% for row in overdue_items %}
-        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.overdue_days }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="empty">No overdue issues.</p>
-  {% endif %}
-</section>
+<!-- FLEET UTILIZATION BAR -->
+<div class="row" style="margin-bottom: 25px;">
+    <div class="col-md-12">
+        <div class="nfsu-card" style="padding: 18px 22px; margin-bottom: 0; background: #ffffff; border-left: 5px solid #002147;">
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                <div class="col-md-3 col-sm-12">
+                    <span style="font-size: 11px; font-weight: 700; color: #002147; text-transform: uppercase; letter-spacing: 0.5px;">Forensic Fleet Utilization</span>
+                    <h2 style="margin: 0; font-size: 26px; font-weight: 800; color: #002147;">{{ analytics.utilization_rate }}%</h2>
+                </div>
+                <div class="col-md-5 col-sm-12" style="margin: 10px 0;">
+                    <div style="height: 12px; background: #e2e8f0; border-radius: 20px; overflow: hidden;">
+                        <div style="height: 100%; width: {{ analytics.utilization_rate }}%; background: linear-gradient(90deg, #002147 0%, #ddb55e 100%); border-radius: 20px;"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 text-right">
+                    <span class="badge-nfsu badge-nfsu-navy" style="margin-right: 6px;">{{ analytics.active_reservations_count }} Active Bookings</span>
+                    <span class="badge-nfsu badge-nfsu-warning" style="margin-right: 6px;">{{ analytics.open_maintenance_count }} Calibration Orders</span>
+                    <span class="badge-nfsu badge-nfsu-success">{{ analytics.active_kits_count }} Field Kits</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<section class="panel">
-  <h3>Due in 5 Days</h3>
-  {% if upcoming_items %}
-    <table>
-      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due Date</th></tr></thead>
-      <tbody>
-      {% for row in upcoming_items %}
-        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p class="empty">No upcoming returns in the next 5 days.</p>
-  {% endif %}
-</section>
+<!-- 2-COLUMN SECTION: OVERDUE ALERTS & UPCOMING DUE -->
+<div class="row">
+    <!-- OVERDUE DELINQUENT ITEMS -->
+    <div class="col-md-6 col-sm-12">
+        <div class="nfsu-card">
+            <div class="nfsu-card-header" style="border-left: 4px solid #dc2626;">
+                <h4 style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Overdue Equipment Recall Alerts</h4>
+                <a href="{{ url_for('due_items') }}" class="btn btn-xs btn-default">Full Recall List</a>
+            </div>
+            <div class="nfsu-card-body" style="padding: 0;">
+                {% if overdue_items %}
+                    <div class="table-responsive">
+                        <table class="table table-nfsu">
+                            <thead>
+                                <tr>
+                                    <th>Issue ID</th>
+                                    <th>Scholar</th>
+                                    <th>SKU</th>
+                                    <th>Qty</th>
+                                    <th>Delay</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in overdue_items %}
+                                <tr>
+                                    <td><code>{{ row.issue_id }}</code></td>
+                                    <td><a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 700;">{{ row.student_enrolment }}</a></td>
+                                    <td><strong>{{ row.item_code }}</strong></td>
+                                    <td><span class="badge-nfsu badge-nfsu-warning">{{ row.outstanding_quantity }}</span></td>
+                                    <td><span class="badge-nfsu badge-nfsu-danger">+{{ row.overdue_days }}d overdue</span></td>
+                                    <td>
+                                        <a href="{{ url_for('transactions') }}" class="btn btn-xs btn-nfsu-primary">Receive</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
+                        <i class="fas fa-check-circle" style="color: #16a34a; font-size: 24px; margin-bottom: 8px;"></i><br>
+                        All hardware returned on schedule. Zero chain-of-custody delinquency.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- UPCOMING DUE -->
+    <div class="col-md-6 col-sm-12">
+        <div class="nfsu-card">
+            <div class="nfsu-card-header" style="border-left: 4px solid #0284c7;">
+                <h4 style="color: #002147;"><i class="fas fa-clock"></i> Returns Expected in Next 5 Days</h4>
+                <a href="{{ url_for('due_items') }}" class="btn btn-xs btn-default">Calendar</a>
+            </div>
+            <div class="nfsu-card-body" style="padding: 0;">
+                {% if upcoming_items %}
+                    <div class="table-responsive">
+                        <table class="table table-nfsu">
+                            <thead>
+                                <tr>
+                                    <th>Issue ID</th>
+                                    <th>Scholar</th>
+                                    <th>Equipment</th>
+                                    <th>Qty</th>
+                                    <th>Due Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in upcoming_items %}
+                                <tr>
+                                    <td><code>{{ row.issue_id }}</code></td>
+                                    <td><a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 700;">{{ row.student_enrolment }}</a></td>
+                                    <td><strong>{{ row.item_code }}</strong></td>
+                                    <td>{{ row.outstanding_quantity }}</td>
+                                    <td><span class="badge-nfsu badge-nfsu-info">{{ row.due_date }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
+                        No upcoming returns scheduled in the next 5 days.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2-COLUMN SECTION: APPROVED BOOKINGS & CHAIN OF CUSTODY ACTIVITY -->
+<div class="row">
+    <!-- RESERVATIONS -->
+    <div class="col-md-6 col-sm-12">
+        <div class="nfsu-card">
+            <div class="nfsu-card-header">
+                <h4><i class="fas fa-calendar-check" style="color: #ddb55e;"></i> Approved Laboratory Bookings</h4>
+                <a href="{{ url_for('reservations_list') }}" class="btn btn-xs btn-default">All Bookings</a>
+            </div>
+            <div class="nfsu-card-body" style="padding: 0;">
+                {% if active_reservations %}
+                    <div class="table-responsive">
+                        <table class="table table-nfsu">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Scholar</th>
+                                    <th>Equipment</th>
+                                    <th>Schedule</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for res in active_reservations %}
+                                <tr>
+                                    <td><code>{{ res.reservation_id }}</code></td>
+                                    <td>{{ res.student_enrolment }}</td>
+                                    <td><strong>{{ res.item_code }}</strong> ({{ res.quantity }})</td>
+                                    <td style="font-size: 12px;">{{ res.start_date }} &rarr; {{ res.end_date }}</td>
+                                    <td><span class="badge-nfsu badge-nfsu-success">{{ res.status }}</span></td>
+                                    <td>
+                                        {% if res.status in ['pending', 'approved'] %}
+                                            <form method="post" action="{{ url_for('fulfill_reservation_view', res_id=res.reservation_id) }}" style="display:inline;">
+                                                <button type="submit" class="btn btn-xs btn-nfsu-primary">Issue</button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
+                        No active laboratory reservations.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAIN OF CUSTODY AUDIT ACTIVITY -->
+    <div class="col-md-6 col-sm-12">
+        <div class="nfsu-card">
+            <div class="nfsu-card-header">
+                <h4><i class="fas fa-history" style="color: #002147;"></i> Chain of Custody Activity Ledger</h4>
+                <a href="{{ url_for('history') }}" class="btn btn-xs btn-default">Full Ledger</a>
+            </div>
+            <div class="nfsu-card-body" style="padding: 0;">
+                {% if recent_activity %}
+                    <div class="table-responsive">
+                        <table class="table table-nfsu">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Custody Action</th>
+                                    <th>Equipment / Voucher</th>
+                                    <th>Officer / Tech</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in recent_activity|reverse %}
+                                <tr>
+                                    <td style="font-size: 12px; color: #64748b;">{{ event.date }}</td>
+                                    <td>
+                                        <span class="badge-nfsu badge-nfsu-navy">{{ event.type.replace('_', ' ') }}</span>
+                                    </td>
+                                    <td>
+                                        {% if event.item_code %}
+                                            <strong>{{ event.item_code }}</strong>
+                                        {% endif %}
+                                        {% if event.issue_id %}
+                                            <a href="{{ url_for('issue_receipt', issue_id=event.issue_id) }}" style="color: #c8131a; margin-left: 4px; font-weight: 700;" title="Print Voucher">#{{ event.issue_id }}</a>
+                                        {% endif %}
+                                    </td>
+                                    <td style="font-size: 12.5px; font-weight: 600;">{{ event.responsible_user }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
+                        No recent custody activity recorded.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NFSU CAMPUS NETWORK & LEADERSHIP BANNER -->
+<div class="row" style="margin-top: 15px;">
+    <div class="col-md-12">
+        <div class="nfsu-card" style="background: linear-gradient(135deg, #002147 0%, #001733 100%); color: #ffffff; padding: 25px 30px;">
+            <div class="row">
+                <div class="col-md-7">
+                    <h4 style="color: #ddb55e; font-weight: 700; margin-top: 0; font-size: 17px;">
+                        <i class="fas fa-map-marked-alt"></i> NFSU Pan-India Forensic Laboratory Network
+                    </h4>
+                    <p style="color: #cbd5e1; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
+                        Connecting Central Laboratories across 16 Campuses under the Ministry of Home Affairs, Government of India:
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                        <span class="badge-nfsu" style="background: rgba(221, 181, 94, 0.2); color: #ddb55e; border: 1px solid #ddb55e;">Gujarat (HQ)</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Delhi</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Goa</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Tripura</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Bhopal</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Pune</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Guwahati</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Manipur</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Dharwad</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Uganda</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Bhubaneswar</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Chennai</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Jaipur</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Nagpur</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Raipur</span>
+                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Varanasi</span>
+                    </div>
+                </div>
+                <div class="col-md-5" style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 25px;">
+                    <div style="font-style: italic; color: #e2e8f0; font-size: 13px; margin-bottom: 8px;">
+                        "NFSU देश के क्रिमिनल जस्टिस सिस्टम के कायाकल्प में अहम भूमिका निभा रही है। इसलिए देश की कानून व्यवस्था को और मजबूत व परिणामलक्षी बनाने हेतु भारत सरकार देश में NFSU कैंपस का जाल बुन रही है।"
+                    </div>
+                    <div style="font-size: 12px; font-weight: 700; color: #ddb55e;">— Shri Amitbhai Shah</div>
+                    <div style="font-size: 11px; color: #94a3b8;">Minister of Home Affairs, Government of India</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

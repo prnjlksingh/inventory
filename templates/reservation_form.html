@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Book Equipment Reservation{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Reserve Equipment for Upcoming Dates</h1>
+    <p class="page-subtitle">Schedule lab and campus hardware ahead of time to lock in availability.</p>
+  </div>
+</div>
+
+<div class="panel" style="max-width:680px;">
+  <form method="post">
+    <div class="form-grid" style="margin-bottom:1.25rem;">
+      <div class="form-group">
+        <label for="student_enrolment">Student *</label>
+        <select id="student_enrolment" name="student_enrolment" required>
+          <option value="">Select student...</option>
+          {% for s in students %}
+            <option value="{{ s.enrolment_number }}">{{ s.enrolment_number }} — {{ s.name }} ({{ s.programme }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="item_code">Equipment Item *</label>
+        <select id="item_code" name="item_code" required>
+          <option value="">Select item...</option>
+          {% for it in items %}
+            <option value="{{ it.code }}">{{ it.code }} — {{ it.name }} ({{ it.category }})</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Quantity *</label>
+        <input type="number" id="quantity" name="quantity" min="1" value="1" required>
+      </div>
+
+      <div class="form-group">
+        <label for="start_date">Reservation Start Date *</label>
+        <input type="date" id="start_date" name="start_date" value="{{ today }}" required>
+      </div>
+
+      <div class="form-group">
+        <label for="end_date">Expected Return Date *</label>
+        <input type="date" id="end_date" name="end_date" required>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.25rem;">
+      <label for="purpose">Project / Coursework Purpose *</label>
+      <input type="text" id="purpose" name="purpose" placeholder="e.g. Media Production Capstone, Robotics Workshop" required>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label for="notes">Special Requirements / Notes</label>
+      <textarea id="notes" name="notes" placeholder="Battery requirements, specific accessories, pickup timing..."></textarea>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+      <a href="{{ url_for('reservations_list') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Submit Equipment Reservation</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

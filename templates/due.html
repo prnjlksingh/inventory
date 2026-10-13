@@ -1,35 +1,112 @@
 {% extends "base.html" %}
+{% block title %}Due & Delinquent Equipment{% endblock %}
+
 {% block content %}
-<h2 class="page-title">Overdue & Upcoming Returns</h2>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Due & Delinquent Equipment Returns</h1>
+    <p class="page-subtitle">Actionable dashboard for equipment overdue recovery and upcoming returns schedule.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('export_overdue_csv') }}" class="btn btn-outline">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Export Overdue Report CSV
+    </a>
+  </div>
+</div>
+
+<!-- OVERDUE SECTION -->
 <section class="panel">
-  <h3>Overdue</h3>
+  <div class="panel-header">
+    <div class="panel-title" style="color:var(--danger); display:flex; align-items:center; gap:0.5rem;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      Delinquent Overdue Items
+    </div>
+    <span class="badge badge-danger">{{ overdue_items|length }} Overdue</span>
+  </div>
   {% if overdue_items %}
-    <table>
-      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due date</th><th>Overdue days</th></tr></thead>
-      <tbody>
-      {% for row in overdue_items %}
-        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td><td>{{ row.overdue_days }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Borrower Student</th>
+            <th>Item Code</th>
+            <th>Outstanding</th>
+            <th>Due Date</th>
+            <th>Overdue Days</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for row in overdue_items %}
+          <tr>
+            <td><code>{{ row.issue_id }}</code></td>
+            <td>
+              <a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+                {{ row.student_enrolment }}
+              </a>
+            </td>
+            <td><strong>{{ row.item_code }}</strong></td>
+            <td><span class="badge badge-warn">{{ row.outstanding_quantity }}</span></td>
+            <td><strong style="color:var(--danger);">{{ row.due_date }}</strong></td>
+            <td><span class="badge badge-danger">+{{ row.overdue_days }} days overdue</span></td>
+            <td>
+              <div style="display:flex; gap:0.4rem;">
+                <a href="{{ url_for('issue_receipt', issue_id=row.issue_id) }}" class="btn btn-outline btn-sm" target="_blank">Slip</a>
+                <a href="{{ url_for('transactions') }}" class="btn btn-secondary btn-sm">Process Return</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p class="empty">No overdue returns.</p>
+    <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0; text-align:center;">No overdue returns found. Excellent fleet turnaround!</p>
   {% endif %}
 </section>
 
+<!-- UPCOMING RETURNS -->
 <section class="panel">
-  <h3>Upcoming (Next 5 days)</h3>
+  <div class="panel-header">
+    <div class="panel-title" style="display:flex; align-items:center; gap:0.5rem;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      Upcoming Scheduled Returns (Next 5 Days)
+    </div>
+    <span class="badge badge-info">{{ upcoming_items|length }} Scheduled</span>
+  </div>
   {% if upcoming_items %}
-    <table>
-      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due date</th></tr></thead>
-      <tbody>
-      {% for row in upcoming_items %}
-        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Borrower Student</th>
+            <th>Item Code</th>
+            <th>Outstanding</th>
+            <th>Expected Return Date</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for row in upcoming_items %}
+          <tr>
+            <td><code>{{ row.issue_id }}</code></td>
+            <td>
+              <a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+                {{ row.student_enrolment }}
+              </a>
+            </td>
+            <td><strong>{{ row.item_code }}</strong></td>
+            <td>{{ row.outstanding_quantity }}</td>
+            <td><span class="badge badge-info">{{ row.due_date }}</span></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p class="empty">No upcoming due returns.</p>
+    <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0; text-align:center;">No upcoming returns scheduled in the next 5 days.</p>
   {% endif %}
 </section>
 {% endblock %}

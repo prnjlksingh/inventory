@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Kits & Equipment Bundles{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Equipment Kits & Bundles</h1>
+    <p class="page-subtitle">Group multi-component gear (cameras, mics, lenses, tripods) into 1-click checkout packages.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('add_kit') }}" class="btn btn-primary">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Create New Kit
+    </a>
+  </div>
+</div>
+
+<div class="panel">
+  {% if kits %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+      {% for kit in kits %}
+        {% set ready = kit_statuses[kit.kit_id] %}
+        <div style="border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem; background:#fff; display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow-sm);">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+              <div>
+                <span class="badge badge-neutral" style="margin-bottom:0.35rem;">{{ kit.category }}</span>
+                <h3 style="font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0;">{{ kit.name }}</h3>
+                <code style="font-size:0.78rem; color:var(--text-muted);">{{ kit.kit_id }}</code>
+              </div>
+              <div>
+                {% if ready %}
+                  <span class="badge badge-success">✓ In Stock & Ready</span>
+                {% else %}
+                  <span class="badge badge-danger">✗ Items Missing</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <p style="color:var(--text-secondary); font-size:0.86rem; margin-bottom:1rem;">{{ kit.description or 'No description provided.' }}</p>
+
+            <div style="background:#f8fafc; border-radius:8px; padding:0.75rem; margin-bottom:1rem;">
+              <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; color:var(--text-muted); margin-bottom:0.4rem;">Kit Contents:</div>
+              <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem;">
+                {% for it in kit.items %}
+                  <li style="display:flex; justify-content:space-between; padding:0.25rem 0; border-bottom:1px solid #edf2f7;">
+                    <span><strong>{{ it.item_code }}</strong></span>
+                    <span style="color:var(--text-secondary);">qty: {{ it.quantity }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+            {% if ready %}
+              <a href="{{ url_for('issue_kit_view', kit_id=kit.kit_id) }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">
+                1-Click Bundle Checkout &rarr;
+              </a>
+            {% else %}
+              <button disabled class="btn btn-secondary btn-sm" style="width:100%; opacity:0.6; cursor:not-allowed;">
+                Unavailable (Stock Shortage)
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align:center; padding:3rem 1rem;">
+      <p style="color:var(--text-muted); margin-bottom:1rem;">No equipment bundle kits defined yet.</p>
+      <a href="{{ url_for('add_kit') }}" class="btn btn-primary">Define your first Kit</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

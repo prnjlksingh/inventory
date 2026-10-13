@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Create Equipment Kit{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Define New Equipment Kit</h1>
+    <p class="page-subtitle">Combine multiple gear items and consumables into an atomic bundle.</p>
+  </div>
+</div>
+
+<div class="panel" style="max-width:760px;">
+  <form method="post">
+    <div class="form-grid" style="margin-bottom:1.25rem;">
+      <div class="form-group">
+        <label for="kit_id">Kit Identifier Code *</label>
+        <input id="kit_id" name="kit_id" placeholder="e.g. KIT-VR-01" required>
+      </div>
+      <div class="form-group">
+        <label for="name">Kit Name *</label>
+        <input id="name" name="name" placeholder="e.g. VR Development Pod" required>
+      </div>
+      <div class="form-group">
+        <label for="category">Category</label>
+        <input id="category" name="category" placeholder="e.g. Media, Robotics, Audio" value="Production">
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label for="description">Bundle Description</label>
+      <textarea id="description" name="description" placeholder="Specify bundle contents, purpose, and special instructions..."></textarea>
+    </div>
+
+    <div style="border-top:1px solid #e2e8f0; padding-top:1.25rem; margin-bottom:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <label style="font-size:0.95rem; font-weight:700; margin:0;">Kit Components</label>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addKitItemRow()">+ Add Item</button>
+      </div>
+
+      <div id="kit-items-container">
+        <div class="form-grid item-row" style="margin-bottom:0.75rem; align-items:flex-end;">
+          <div class="form-group" style="flex:2;">
+            <label>Item</label>
+            <select name="item_code[]" required>
+              <option value="">Select inventory item...</option>
+              {% for it in items %}
+                <option value="{{ it.code }}">{{ it.code }} — {{ it.name }} ({{ it.category }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Quantity</label>
+            <input type="number" name="quantity[]" min="1" value="1" required>
+          </div>
+          <div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="this.closest('.item-row').remove()" style="color:#dc2626;">Remove</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+      <a href="{{ url_for('kits_list') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save Equipment Kit</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  function addKitItemRow() {
+    const container = document.getElementById('kit-items-container');
+    const firstRow = container.querySelector('.item-row');
+    const clone = firstRow.cloneNode(true);
+    clone.querySelector('input').value = '1';
+    clone.querySelector('select').selectedIndex = 0;
+    container.appendChild(clone);
+  }
+</script>
+{% endblock %}

@@ -1,47 +1,89 @@
 {% extends "base.html" %}
+{% block title %}{{ 'Edit item: ' ~ item.code if item else 'Add inventory item' }}{% endblock %}
+
 {% block content %}
-<h2 class="page-title">{{ 'Edit inventory item' if item else 'Add inventory item' }}</h2>
-<section class="panel">
-  <form method="post" class="grid-2">
-    <div>
-      <label for="code">Item code</label>
-      <input id="code" name="code" value="{{ item.code if item else '' }}" {{ 'readonly' if item else '' }} required />
+<div class="page-header">
+  <div>
+    <h1 class="page-title">{{ 'Edit Inventory Item: ' ~ item.name if item else 'Add New Inventory Item' }}</h1>
+    <p class="page-subtitle">Configure SKU code, description, make/model, and tracking method.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('inventory_list') }}" class="btn btn-secondary">&larr; Back to Inventory</a>
+  </div>
+</div>
+
+<div class="panel" style="max-width:760px;">
+  <form method="post">
+    <div class="form-grid" style="margin-bottom:1.25rem;">
+      <div class="form-group">
+        <label for="code">Item Code (SKU) *</label>
+        <input id="code" name="code" value="{{ item.code if item else '' }}" {{ 'readonly style="background:#f1f5f9;"' if item else '' }} required />
+      </div>
+      <div class="form-group">
+        <label for="name">Item Name *</label>
+        <input id="name" name="name" value="{{ item.name if item else '' }}" required />
+      </div>
+      <div class="form-group">
+        <label for="category">Category *</label>
+        <input id="category" name="category" value="{{ item.category if item else '' }}" required />
+      </div>
+      <div class="form-group">
+        <label for="make_model">Make / Model *</label>
+        <input id="make_model" name="make_model" value="{{ item.make_model if item else '' }}" required />
+      </div>
+      <div class="form-group">
+        <label for="total_quantity">Total Inventory Stock *</label>
+        <input id="total_quantity" type="number" min="0" name="total_quantity" value="{{ item.total_quantity if item else 1 }}" required />
+      </div>
+      <div class="form-group">
+        <label for="tracking_type">Tracking Mode</label>
+        {% if item %}
+          <input id="tracking_type" name="tracking_type" value="{{ item.tracking_type }}" readonly style="background:#f1f5f9;" />
+        {% else %}
+          <select id="tracking_type" name="tracking_type">
+            <option value="quantity">Bulk Quantity Tracking</option>
+            <option value="asset">Individual Serialized Asset Tracking</option>
+          </select>
+        {% endif %}
+      </div>
     </div>
-    <div>
-      <label for="name">Name</label>
-      <input id="name" name="name" value="{{ item.name if item else '' }}" required />
-    </div>
-    <div>
-      <label for="category">Category</label>
-      <input id="category" name="category" value="{{ item.category if item else '' }}" required />
-    </div>
-    <div>
-      <label for="make_model">Make/Model</label>
-      <input id="make_model" name="make_model" value="{{ item.make_model if item else '' }}" required />
-    </div>
-    <div>
-      <label for="total_quantity">Total quantity</label>
-      <input id="total_quantity" type="number" min="0" name="total_quantity" value="{{ item.total_quantity if item else 1 }}" required />
-    </div>
-    <div>
-      <label for="tracking_type">Tracking type</label>
-      {% if item %}
-        <input id="tracking_type" name="tracking_type" value="{{ item.tracking_type }}" readonly />
-      {% else %}
-        <select id="tracking_type" name="tracking_type">
-          <option value="quantity">Quantity</option>
-          <option value="asset">Asset</option>
-        </select>
-      {% endif %}
-    </div>
-    <div style="grid-column: 1/-1;">
-      <label for="description">Description</label>
+
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label for="description">Item Description & Specifications</label>
       <textarea id="description" name="description" required>{{ item.description if item else '' }}</textarea>
     </div>
-    <div class="actions" style="grid-column: 1/-1;">
-      <button type="submit">Save</button>
-      <a href="{{ url_for('inventory_list') }}"><button type="button" class="secondary">Cancel</button></a>
+
+    <div style="display:flex; gap:0.75rem; justify-content:flex-end;">
+      <a href="{{ url_for('inventory_list') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save Inventory Item</button>
     </div>
   </form>
-</section>
+</div>
+
+{% if item and item.tracking_type == 'asset' %}
+<div class="panel" style="max-width:760px; margin-top:1.5rem;">
+  <div class="panel-header">
+    <div class="panel-title">Add Physical Serialized Asset Tag</div>
+  </div>
+  <form method="post" action="{{ url_for('add_asset_to_item', item_code=item.code) }}">
+    <div class="form-grid" style="align-items:flex-end;">
+      <div class="form-group">
+        <label for="asset_id">Asset Tag ID *</label>
+        <input id="asset_id" name="asset_id" placeholder="e.g. {{ item.code }}-005" required>
+      </div>
+      <div class="form-group">
+        <label for="serial_number">Hardware Serial Number *</label>
+        <input id="serial_number" name="serial_number" placeholder="Manufacturer Serial..." required>
+      </div>
+      <div class="form-group">
+        <label for="location">Location / Bin</label>
+        <input id="location" name="location" placeholder="Cabinet B, Shelf 2" value="Main Storage">
+      </div>
+      <div>
+        <button type="submit" class="btn btn-primary">+ Register Asset</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Maintenance & Repair Work Orders{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Equipment Maintenance & Service Orders</h1>
+    <p class="page-subtitle">Track repairs, calibration, technician service logs, and maintenance cost expenditures.</p>
+  </div>
+  <div>
+    <a href="{{ url_for('add_maintenance') }}" class="btn btn-primary">
+      <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Log Service Order
+    </a>
+  </div>
+</div>
+
+<div class="cards-grid" style="grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); margin-bottom:1.5rem;">
+  <div class="stat-card c-warning">
+    <div class="stat-card-label">Active Work Orders</div>
+    <div class="stat-card-value">{{ open_count }}</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">Units currently in service</div>
+  </div>
+  <div class="stat-card c-info">
+    <div class="stat-card-label">Total Repair Costs</div>
+    <div class="stat-card-value">${{ "%.2f"|format(total_cost) }}</div>
+    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;">Cumulative hardware upkeep</div>
+  </div>
+</div>
+
+<div class="panel">
+  {% if records %}
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Equipment / Asset</th>
+            <th>Title & Issue</th>
+            <th>Technician</th>
+            <th>Cost</th>
+            <th>Started Date</th>
+            <th>Status</th>
+            <th>Resolution</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in records %}
+          <tr>
+            <td><code>{{ r.record_id }}</code></td>
+            <td>
+              <strong>{{ r.item_code }}</strong>
+              {% if r.asset_id %}
+                <br><code style="font-size:0.78rem; color:var(--text-muted);">{{ r.asset_id }}</code>
+              {% endif %}
+            </td>
+            <td>
+              <div style="font-weight:600;">{{ r.title }}</div>
+              <small style="color:var(--text-muted);">{{ r.issue_description }}</small>
+            </td>
+            <td>{{ r.technician }}</td>
+            <td style="font-weight:600;">${{ "%.2f"|format(r.cost) }}</td>
+            <td>{{ r.started_date }}</td>
+            <td>
+              {% if r.status == 'open' %}
+                <span class="badge badge-warn">In Service</span>
+              {% else %}
+                <span class="badge badge-success">Completed</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.status == 'open' %}
+                <form method="post" action="{{ url_for('complete_maintenance_view', rec_id=r.record_id) }}" style="display:flex; gap:0.35rem; align-items:center;">
+                  <select name="resolution_condition" style="padding:0.25rem 0.4rem; font-size:0.78rem;">
+                    <option value="usable">Restore to Usable</option>
+                    <option value="damaged">Damaged (Unrepairable)</option>
+                    <option value="retired">Retire / Scrap</option>
+                  </select>
+                  <button type="submit" class="btn btn-primary btn-sm">Complete</button>
+                </form>
+              {% else %}
+                <span style="font-size:0.8rem; color:var(--text-muted);">Resolved {{ r.completed_date }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:var(--text-muted); font-style:italic; padding:2rem 0; text-align:center;">No maintenance records logged.</p>
+  {% endif %}
+</div>
+{% endblock %}

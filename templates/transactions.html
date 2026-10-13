@@ -1,104 +1,167 @@
 {% extends "base.html" %}
+{% block title %}Issue & Return Workflows{% endblock %}
+
 {% block content %}
-<h2 class="page-title">Issue & Return Workflows</h2>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Issue & Return Workflows</h1>
+    <p class="page-subtitle">Equipment checkout, condition assessment on check-in, and custody tracking.</p>
+  </div>
+</div>
 
-<section class="panel">
-  <h3>Issue Item</h3>
-  <form method="post" class="grid-2">
-    <input type="hidden" name="action" value="issue" />
-    <div>
-      <label for="student_enrolment">Student</label>
-      <select id="student_enrolment" name="student_enrolment" required>
-        {% for student in students %}
-          <option value="{{ student.enrolment_number }}">{{ student.enrolment_number }} — {{ student.name }}</option>
-        {% endfor %}
-      </select>
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(440px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+  <!-- ISSUE FORM -->
+  <section class="panel">
+    <div class="panel-header">
+      <div class="panel-title" style="color:var(--primary); display:flex; align-items:center; gap:0.5rem;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Equipment Checkout (Issue)
+      </div>
     </div>
-    <div>
-      <label for="item_code">Item</label>
-      <select id="item_code" name="item_code" required>
-        {% for item in items %}
-          <option value="{{ item.code }}">{{ item.code }} — {{ item.name }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <label for="quantity">Quantity</label>
-      <input id="quantity" name="quantity" type="number" min="1" value="1" required />
-    </div>
-    <div>
-      <label for="asset_id">Asset ID (required for asset-tracked items)</label>
-      <input id="asset_id" name="asset_id" placeholder="e.g., DSLR-001" />
-    </div>
-    <div>
-      <label for="issue_date">Issue date</label>
-      <input id="issue_date" name="issue_date" type="date" />
-    </div>
-    <div>
-      <label for="staff">Issued by</label>
-      <input id="staff" name="staff" placeholder="Inventory Desk" />
-    </div>
-    <div style="grid-column: 1 / -1;">
-      <label for="purpose">Purpose</label>
-      <textarea id="purpose" name="purpose" required></textarea>
-    </div>
-    <div class="actions" style="grid-column: 1 / -1;">
-      <button type="submit">Issue item</button>
-    </div>
-  </form>
-</section>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="action" value="issue" />
+      <div class="form-group">
+        <label for="student_enrolment">Student *</label>
+        <select id="student_enrolment" name="student_enrolment" required>
+          <option value="">Select student...</option>
+          {% for student in students %}
+            <option value="{{ student.enrolment_number }}">{{ student.enrolment_number }} — {{ student.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="item_code">Item *</label>
+        <select id="item_code" name="item_code" required>
+          <option value="">Select item...</option>
+          {% for item in items %}
+            <option value="{{ item.code }}">{{ item.code }} — {{ item.name }} ({{ item.tracking_type }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantity *</label>
+        <input id="quantity" name="quantity" type="number" min="1" value="1" required />
+      </div>
+      <div class="form-group">
+        <label for="asset_id">Asset ID (if asset-tracked)</label>
+        <input id="asset_id" name="asset_id" placeholder="e.g. DSLR-001" />
+      </div>
+      <div class="form-group">
+        <label for="issue_date">Issue Date</label>
+        <input id="issue_date" name="issue_date" type="date" />
+      </div>
+      <div class="form-group">
+        <label for="staff">Authorized By</label>
+        <input id="staff" name="staff" placeholder="Inventory Desk" value="Inventory Desk" />
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label for="purpose">Checkout Purpose *</label>
+        <textarea id="purpose" name="purpose" placeholder="Class project, workshop, field filming..." required></textarea>
+      </div>
+      <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+        <button type="submit" class="btn btn-primary">Process Checkout</button>
+      </div>
+    </form>
+  </section>
 
-<section class="panel">
-  <h3>Record Return</h3>
-  <form method="post" class="grid-2">
-    <input type="hidden" name="action" value="return" />
-    <div>
-      <label for="issue_id">Open issue</label>
-      <select id="issue_id" name="issue_id" required>
-        {% for issue in open_issues %}
-          <option value="{{ issue.issue_id }}">{{ issue.issue_id }} — {{ issue.student_enrolment }} — {{ issue.item_code }} (outstanding {{ issue.outstanding_quantity }})</option>
-        {% endfor %}
-      </select>
+  <!-- RETURN FORM -->
+  <section class="panel">
+    <div class="panel-header">
+      <div class="panel-title" style="color:var(--success); display:flex; align-items:center; gap:0.5rem;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Equipment Check-in (Return)
+      </div>
     </div>
-    <div>
-      <label for="quantity_returned">Quantity returned</label>
-      <input id="quantity_returned" name="quantity_returned" type="number" min="1" value="1" required />
-    </div>
-    <div>
-      <label for="condition_on_return">Condition on return</label>
-      <select id="condition_on_return" name="condition_on_return" required>
-        {% for condition in conditions %}
-          <option value="{{ condition }}">{{ condition }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <label for="return_date">Return date</label>
-      <input id="return_date" name="return_date" type="date" />
-    </div>
-    <div>
-      <label for="staff_return">Received by</label>
-      <input id="staff_return" name="staff" placeholder="Inventory Desk" />
-    </div>
-    <div class="actions" style="grid-column: 1 / -1;">
-      <button type="submit">Record return</button>
-    </div>
-  </form>
-</section>
+    <form method="post" class="form-grid">
+      <input type="hidden" name="action" value="return" />
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label for="issue_id">Select Open Checkout Record *</label>
+        <select id="issue_id" name="issue_id" required>
+          <option value="">Select active issue...</option>
+          {% for issue in open_issues %}
+            <option value="{{ issue.issue_id }}">{{ issue.issue_id }} &bull; {{ issue.student_enrolment }} &bull; {{ issue.item_code }} (outstanding: {{ issue.outstanding_quantity }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="quantity_returned">Quantity Returned *</label>
+        <input id="quantity_returned" name="quantity_returned" type="number" min="1" value="1" required />
+      </div>
+      <div class="form-group">
+        <label for="condition_on_return">Condition on Return *</label>
+        <select id="condition_on_return" name="condition_on_return" required>
+          {% for condition in conditions %}
+            <option value="{{ condition }}">{{ condition|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="return_date">Return Date</label>
+        <input id="return_date" name="return_date" type="date" />
+      </div>
+      <div class="form-group">
+        <label for="staff_return">Received By Staff</label>
+        <input id="staff_return" name="staff" placeholder="Inventory Desk" value="Inventory Desk" />
+      </div>
+      <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+        <button type="submit" class="btn btn-success">Record Return</button>
+      </div>
+    </form>
+  </section>
+</div>
 
+<!-- OPEN ISSUES SNAPSHOT -->
 <section class="panel">
-  <h3>Open Issues Snapshot</h3>
+  <div class="panel-header">
+    <div class="panel-title">Active Equipment Custody Records</div>
+    <span class="badge badge-info">{{ open_issues|length }} Open Issues</span>
+  </div>
   {% if open_issues %}
-    <table>
-      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due</th></tr></thead>
-      <tbody>
-      {% for issue in open_issues %}
-        <tr><td>{{ issue.issue_id }}</td><td>{{ issue.student_enrolment }}</td><td>{{ issue.item_code }}</td><td>{{ issue.outstanding_quantity }}</td><td>{{ issue.due_date }}</td></tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Issue ID</th>
+            <th>Borrower Student</th>
+            <th>Item SKU</th>
+            <th>Outstanding</th>
+            <th>Due Date</th>
+            <th>Staff</th>
+            <th>Custody Slip</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for issue in open_issues %}
+          <tr>
+            <td><code>{{ issue.issue_id }}</code></td>
+            <td>
+              <a href="{{ url_for('student_detail', enrolment=issue.student_enrolment) }}" style="color:var(--primary); font-weight:600; text-decoration:none;">
+                {{ issue.student_enrolment }}
+              </a>
+            </td>
+            <td>
+              <strong>{{ issue.item_code }}</strong>
+              {% if issue.asset_id %}
+                <span class="badge badge-neutral" style="margin-left:4px;">{{ issue.asset_id }}</span>
+              {% endif %}
+            </td>
+            <td><span class="badge badge-warn">{{ issue.outstanding_quantity }}</span></td>
+            <td>
+              <span style="font-weight:600;">{{ issue.due_date }}</span>
+            </td>
+            <td style="color:var(--text-muted); font-size:0.82rem;">{{ issue.issuing_staff }}</td>
+            <td>
+              <a href="{{ url_for('issue_receipt', issue_id=issue.issue_id) }}" class="btn btn-outline btn-sm" target="_blank">
+                Print Slip &rarr;
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p class="empty">No open issues currently.</p>
+    <p style="color:var(--text-muted); font-style:italic; padding:1.5rem 0; text-align:center;">No open issues currently.</p>
   {% endif %}
 </section>
 {% endblock %}
