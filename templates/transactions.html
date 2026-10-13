@@ -9,6 +9,7 @@
   </div>
 </div>
 
+{% if is_editor %}
 <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(440px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
   <!-- ISSUE FORM -->
   <section class="panel">
@@ -109,6 +110,23 @@
     </form>
   </section>
 </div>
+{% else %}
+<div class="nfsu-card" style="padding: 24px; border-left: 5px solid #0284c7; margin-bottom: 25px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px;">
+    <div>
+      <h3 style="font-size: 17px; font-weight: 700; color: #002147; margin: 0 0 6px 0;">
+        <i class="fas fa-info-circle" style="color: #0284c7; margin-right: 6px;"></i> Forensic Scholar Portal (User Mode)
+      </h3>
+      <p style="color: #64748b; font-size: 13.5px; margin: 0; line-height: 1.5;">
+        You are viewing the Central Custody Ledger in read-only audit mode. Physical checkouts, dispatches, and check-in assessments are logged by authorized Lab Editors. To request equipment, please submit a workstation booking.
+      </p>
+    </div>
+    <a href="{{ url_for('add_reservation') }}" class="btn btn-nfsu-gold">
+      <i class="fas fa-calendar-plus"></i> Request Workstation Booking
+    </a>
+  </div>
+</div>
+{% endif %}
 
 <!-- OPEN ISSUES SNAPSHOT -->
 <section class="panel">

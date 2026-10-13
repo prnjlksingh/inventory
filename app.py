@@ -6,6 +6,7 @@ import io
 import json
 from typing import Dict, Optional
 
+from functools import wraps
 import os
 from flask import (
     Flask,
@@ -16,6 +17,7 @@ from flask import (
     render_template,
     request,
     send_from_directory,
+    session,
     url_for,
 )
 
@@ -223,10 +225,45 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
 
     @app.context_processor
     def inject_global_data():
+        role = session.get("role", "editor")
         return {
             "all_categories": sorted({item.category for item in _system().items.values()}),
             "current_year": date.today().year,
+            "current_role": role,
+            "is_editor": role == "editor",
+            "is_user": role == "user",
+            "current_user_name": "Lab In-Charge (Admin)" if role == "editor" else "Forensic Scholar (Student)",
         }
+
+    def editor_required(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if session.get("role", "editor") != "editor":
+                flash("Access Restricted: Editor privileges required. Please switch to Editor Mode.", "warning")
+                return redirect(request.referrer or url_for("dashboard"))
+            return f(*args, **kwargs)
+        return decorated_function
+
+    @app.route("/auth/switch-role/<role>")
+    def switch_role(role: str):
+        if role in ["editor", "user"]:
+            session["role"] = role
+            if role == "editor":
+                flash("Switched to Editor Mode. Full equipment management, custody dispatch, and calibration enabled.", "success")
+            else:
+                flash("Switched to User Mode. Browsing as Forensic Scholar & Custodian (Catalog & booking requests only).", "info")
+        return redirect(request.referrer or url_for("dashboard"))
+
+    @app.route("/login", methods=["GET", "POST"])
+    @app.route("/auth/login", methods=["GET", "POST"])
+    def role_login():
+        if request.method == "POST":
+            role = request.form.get("role", "editor")
+            if role in ["editor", "user"]:
+                session["role"] = role
+                flash(f"Authenticated as {'Laboratory In-Charge (Editor)' if role == 'editor' else 'Forensic Scholar (User)'}.", "success")
+                return redirect(url_for("dashboard"))
+        return render_template("login.html")
 
     @app.route("/assets/<path:path>")
     def nfsu_assets(path):
@@ -285,6 +322,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         )
 
     @app.route("/inventory/new", methods=["GET", "POST"])
+    @editor_required
     def add_inventory_item():
         if request.method == "POST":
             try:
@@ -304,6 +342,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         return render_template("inventory_form.html", item=None)
 
     @app.route("/inventory/<item_code>/edit", methods=["GET", "POST"])
+    @editor_required
     def edit_inventory_item(item_code: str):
         item = _system()._require_item(item_code)
         if request.method == "POST":
@@ -331,6 +370,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         return render_template("inventory_form.html", item=item)
 
     @app.route("/inventory/<item_code>/assets/new", methods=["POST"])
+    @editor_required
     def add_asset_to_item(item_code: str):
         try:
             asset_id = request.form["asset_id"].strip()
@@ -357,6 +397,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         return render_template("students.html", students=students)
 
     @app.route("/students/new", methods=["GET", "POST"])
+    @editor_required
     def register_student():
         if request.method == "POST":
             try:
@@ -396,6 +437,9 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
     @app.route("/transactions", methods=["GET", "POST"])
     def transactions():
         if request.method == "POST":
+            if session.get("role", "editor") != "editor":
+                flash("Access Restricted: Equipment checkout and return assessment require Editor privileges. Please switch to Editor mode.", "warning")
+                return redirect(url_for("transactions"))
             action = request.form.get("action")
             try:
                 if action == "issue":
@@ -456,6 +500,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         return render_template("kits.html", kits=kits, kit_statuses=kit_statuses)
 
     @app.route("/kits/new", methods=["GET", "POST"])
+    @editor_required
     def add_kit():
         if request.method == "POST":
             try:
@@ -484,6 +529,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         )
 
     @app.route("/kits/<kit_id>/issue", methods=["GET", "POST"])
+    @editor_required
     def issue_kit_view(kit_id: str):
         kit = _system().get_kit(kit_id)
         if request.method == "POST":
@@ -551,6 +597,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         )
 
     @app.post("/reservations/<res_id>/fulfill")
+    @editor_required
     def fulfill_reservation_view(res_id: str):
         try:
             staff = request.form.get("staff", "Inventory Desk")
@@ -561,6 +608,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         return redirect(url_for("reservations_list"))
 
     @app.post("/reservations/<res_id>/cancel")
+    @editor_required
     def cancel_reservation_view(res_id: str):
         try:
             _system().cancel_reservation(res_id, cancelled_by="Desk Staff")
@@ -586,6 +634,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         )
 
     @app.route("/maintenance/new", methods=["GET", "POST"])
+    @editor_required
     def add_maintenance():
         if request.method == "POST":
             try:
@@ -609,6 +658,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
         )
 
     @app.post("/maintenance/<rec_id>/complete")
+    @editor_required
     def complete_maintenance_view(rec_id: str):
         try:
             condition = request.form.get("resolution_condition", "usable")
@@ -647,6 +697,7 @@ def create_app(test_config: Optional[Dict[str, object]] = None) -> Flask:
     # ==========================================
 
     @app.get("/labels")
+    @editor_required
     def labels_sheet():
         items_with_labels = []
         for it in _system().items.values():

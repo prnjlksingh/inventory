@@ -8,6 +8,7 @@
     <p class="page-subtitle">Hardware inventory catalog, serialized assets, and real-time shelf availability.</p>
   </div>
   <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+    {% if is_editor %}
     <a href="{{ url_for('export_inventory_csv') }}" class="btn btn-outline">
       <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
       Export CSV
@@ -16,6 +17,11 @@
       <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
       Add Inventory Item
     </a>
+    {% else %}
+    <a href="{{ url_for('add_reservation') }}" class="btn btn-nfsu-gold">
+      <i class="fas fa-calendar-plus"></i> Request Workstation Booking
+    </a>
+    {% endif %}
   </div>
 </div>
 
@@ -109,7 +115,11 @@
             </td>
             <td>
               <div style="display:flex; gap:0.4rem;">
+                {% if is_editor %}
                 <a href="{{ url_for('edit_inventory_item', item_code=item.code) }}" class="btn btn-outline btn-sm">Edit</a>
+                {% else %}
+                <a href="{{ url_for('add_reservation') }}?item={{ item.code }}" class="btn btn-outline btn-sm">Reserve</a>
+                {% endif %}
               </div>
             </td>
           </tr>

@@ -7,12 +7,14 @@
     <h1 class="page-title">Equipment Kits & Bundles</h1>
     <p class="page-subtitle">Group multi-component gear (cameras, mics, lenses, tripods) into 1-click checkout packages.</p>
   </div>
+  {% if is_editor %}
   <div>
     <a href="{{ url_for('add_kit') }}" class="btn btn-primary">
       <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
       Create New Kit
     </a>
   </div>
+  {% endif %}
 </div>
 
 <div class="panel">
@@ -53,14 +55,26 @@
           </div>
 
           <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
-            {% if ready %}
-              <a href="{{ url_for('issue_kit_view', kit_id=kit.kit_id) }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">
-                1-Click Bundle Checkout &rarr;
-              </a>
+            {% if is_editor %}
+              {% if ready %}
+                <a href="{{ url_for('issue_kit_view', kit_id=kit.kit_id) }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">
+                  1-Click Bundle Checkout &rarr;
+                </a>
+              {% else %}
+                <button disabled class="btn btn-secondary btn-sm" style="width:100%; opacity:0.6; cursor:not-allowed;">
+                  Unavailable (Stock Shortage)
+                </button>
+              {% endif %}
             {% else %}
-              <button disabled class="btn btn-secondary btn-sm" style="width:100%; opacity:0.6; cursor:not-allowed;">
-                Unavailable (Stock Shortage)
-              </button>
+              {% if ready %}
+                <a href="{{ url_for('add_reservation') }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center;">
+                  Request Kit Reservation &rarr;
+                </a>
+              {% else %}
+                <button disabled class="btn btn-secondary btn-sm" style="width:100%; opacity:0.6; cursor:not-allowed;">
+                  Unavailable (Stock Shortage)
+                </button>
+              {% endif %}
             {% endif %}
           </div>
         </div>
@@ -69,7 +83,9 @@
   {% else %}
     <div style="text-align:center; padding:3rem 1rem;">
       <p style="color:var(--text-muted); margin-bottom:1rem;">No equipment bundle kits defined yet.</p>
-      <a href="{{ url_for('add_kit') }}" class="btn btn-primary">Define your first Kit</a>
+      {% if is_editor %}
+        <a href="{{ url_for('add_kit') }}" class="btn btn-primary">Define your first Kit</a>
+      {% endif %}
     </div>
   {% endif %}
 </div>

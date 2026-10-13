@@ -128,6 +128,42 @@
         color: #001733 !important;
         text-decoration: none !important;
       }
+      .role-badge-pill {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        padding: 3px 10px !important;
+        border-radius: 20px !important;
+        font-size: 11px !important;
+        font-family: 'Poppins', sans-serif !important;
+        letter-spacing: 0.3px !important;
+      }
+      .role-badge-pill.role-editor {
+        background: #002147 !important;
+        color: #ddb55e !important;
+        border: 1px solid #ddb55e !important;
+      }
+      .role-badge-pill.role-user {
+        background: #0284c7 !important;
+        color: #ffffff !important;
+        border: 1px solid #7dd3fc !important;
+      }
+      .btn-role-toggle {
+        background: rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
+        padding: 1px 8px !important;
+        border-radius: 12px !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        margin-left: 4px !important;
+        transition: all 0.2s !important;
+      }
+      .btn-role-toggle:hover {
+        background: #ffffff !important;
+        color: #002147 !important;
+        text-decoration: none !important;
+      }
       .topHeaderLinks {
         list-style: none !important;
         margin: 0 !important;
@@ -642,13 +678,26 @@
                 </ul>
             </div>
             <div class="user-login">
+                <!-- Role Mode Switcher Pill -->
+                {% if is_editor %}
+                <span class="role-badge-pill role-editor" title="Current Portal Mode: Editor (Lab In-Charge)">
+                    <i class="fas fa-user-shield"></i> <strong>EDITOR</strong>
+                    <a href="{{ url_for('switch_role', role='user') }}" class="btn-role-toggle" title="Switch to Scholar User Mode"><i class="fas fa-exchange-alt"></i> User Mode</a>
+                </span>
+                {% else %}
+                <span class="role-badge-pill role-user" title="Current Portal Mode: User (Forensic Scholar)">
+                    <i class="fas fa-user-graduate"></i> <strong>USER</strong>
+                    <a href="{{ url_for('switch_role', role='editor') }}" class="btn-role-toggle" title="Switch to Lab Editor Mode"><i class="fas fa-key"></i> Editor Mode</a>
+                </span>
+                {% endif %}
+
                 <a href="javascript:void(0)" onclick="openScannerModal()" class="btn-topbar-action"><i class="fas fa-barcode"></i> Optical Scanner</a>
                 <a href="javascript:void(0)" onclick="openSearchModal()" class="btn-topbar-action"><i class="fas fa-search"></i> Quick Search (Ctrl+K)</a>
                 <ul class="topHeaderLinks">
+                    <li><a href="{{ url_for('role_login') }}"><i class="fas fa-user-lock"></i> Switch Role</a></li>
                     <li><a href="https://nfsu-ric.in/" target="_blank">RIC-NFSU</a></li>
                     <li><a target="_blank" href="https://nfsu.ac.in/fact">FACT Exam 2026</a></li>
                     <li><a href="https://nfsu.ac.in/tenders">Tender</a></li>
-                    <li><a href="https://nfsu.ac.in/downloads">Downloads</a></li>
                     <li><a href="{{ url_for('swagger_ui') }}"><i class="fas fa-code"></i> API v1</a></li>
                 </ul>
             </div>
@@ -682,18 +731,26 @@
                             <a href="{{ url_for('inventory_list') }}" class="dropdown-toggle" data-toggle="dropdown">Equipment & Labs <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('inventory_list') }}"><i class="fas fa-microscope"></i> All Laboratory Equipment</a></li>
+                                {% if is_editor %}
                                 <li><a href="{{ url_for('add_inventory_item') }}"><i class="fas fa-plus-circle"></i> Onboard New Equipment</a></li>
+                                {% endif %}
                                 <li><a href="{{ url_for('kits_list') }}"><i class="fas fa-briefcase"></i> Forensic Field Kits & Bundles</a></li>
+                                {% if is_editor %}
                                 <li><a href="{{ url_for('add_kit') }}"><i class="fas fa-box-open"></i> Assemble New Field Kit</a></li>
+                                {% else %}
+                                <li><a href="{{ url_for('add_reservation') }}"><i class="fas fa-calendar-plus"></i> Reserve Lab Equipment</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="dropdown {% if request.endpoint in ['transactions', 'due_items', 'history'] %}active{% endif %}">
                             <a href="{{ url_for('transactions') }}" class="dropdown-toggle" data-toggle="dropdown">Chain of Custody <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('transactions') }}"><i class="fas fa-exchange-alt"></i> Custody Ledger / Issue & Return</a></li>
+                                <li><a href="{{ url_for('transactions') }}"><i class="fas fa-exchange-alt"></i> Custody Ledger {% if is_user %}(Read-Only){% else %}/ Issue & Return{% endif %}</a></li>
                                 <li><a href="{{ url_for('due_items') }}"><i class="fas fa-exclamation-triangle"></i> Overdue & Dispatched Items</a></li>
                                 <li><a href="{{ url_for('history') }}"><i class="fas fa-history"></i> Immutable Audit Trail</a></li>
+                                {% if is_editor %}
                                 <li><a href="{{ url_for('labels_sheet') }}"><i class="fas fa-barcode"></i> Print Barcode Tag Sheet</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="dropdown {% if request.endpoint in ['reservations_list', 'add_reservation', 'maintenance_list', 'add_maintenance'] %}active{% endif %}">
@@ -701,15 +758,19 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('reservations_list') }}"><i class="fas fa-calendar-check"></i> Lab Bookings / Reservations</a></li>
                                 <li><a href="{{ url_for('add_reservation') }}"><i class="fas fa-calendar-plus"></i> Reserve Lab Workstation</a></li>
+                                {% if is_editor %}
                                 <li><a href="{{ url_for('maintenance_list') }}"><i class="fas fa-wrench"></i> NABL Calibration & Maintenance</a></li>
                                 <li><a href="{{ url_for('add_maintenance') }}"><i class="fas fa-tools"></i> Log Calibration Work Order</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="dropdown {% if request.endpoint in ['students_list', 'register_student', 'student_detail'] %}active{% endif %}">
                             <a href="{{ url_for('students_list') }}" class="dropdown-toggle" data-toggle="dropdown">Custodians <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('students_list') }}"><i class="fas fa-user-graduate"></i> Forensic Scholars & Officers</a></li>
+                                {% if is_editor %}
                                 <li><a href="{{ url_for('register_student') }}"><i class="fas fa-user-plus"></i> Register Custodian</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         <li class="dropdown megamenu-fw">

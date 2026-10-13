@@ -71,9 +71,11 @@
                 <a href="{{ url_for('issue_receipt', issue_id=record.issue_id) }}" class="btn btn-outline btn-sm" target="_blank">
                   Print Slip
                 </a>
+                {% if is_editor %}
                 <a href="{{ url_for('transactions') }}" class="btn btn-secondary btn-sm">
                   Return
                 </a>
+                {% endif %}
               </div>
             </td>
           </tr>

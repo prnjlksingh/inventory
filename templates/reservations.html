@@ -76,12 +76,16 @@
             <td>
               <div style="display:flex; gap:0.35rem;">
                 {% if r.status in ['approved', 'pending'] %}
-                  <form method="post" action="{{ url_for('fulfill_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-primary btn-sm">Fulfill</button>
-                  </form>
-                  <form method="post" action="{{ url_for('cancel_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
-                    <button type="submit" class="btn btn-outline btn-sm" style="color:#dc2626;" onclick="return confirm('Cancel this reservation?');">Cancel</button>
-                  </form>
+                  {% if is_editor %}
+                    <form method="post" action="{{ url_for('fulfill_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-primary btn-sm">Fulfill</button>
+                    </form>
+                    <form method="post" action="{{ url_for('cancel_reservation_view', res_id=r.reservation_id) }}" style="display:inline;">
+                      <button type="submit" class="btn btn-outline btn-sm" style="color:#dc2626;" onclick="return confirm('Cancel this reservation?');">Cancel</button>
+                    </form>
+                  {% else %}
+                    <span class="badge badge-neutral" style="font-size:0.75rem;">Awaiting Fulfillment</span>
+                  {% endif %}
                 {% else %}
                   <span style="color:var(--text-muted); font-size:0.8rem;">Closed</span>
                 {% endif %}

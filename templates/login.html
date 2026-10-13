@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Access Control & Role Portal{% endblock %}
+
+{% block content %}
+<div class="row" style="margin-top: 10px; margin-bottom: 40px;">
+    <div class="col-md-8 col-md-offset-2 col-sm-12">
+        <div class="text-center" style="margin-bottom: 30px;">
+            <span class="badge-nfsu badge-nfsu-navy" style="font-size: 11px; margin-bottom: 8px;">ACCESS CONTROL &amp; RBAC</span>
+            <h2 style="font-family: 'Poppins', sans-serif; color: #002147; font-weight: 800; margin: 4px 0 10px 0;">
+                Select Laboratory Portal Role
+            </h2>
+            <p style="color: #64748b; font-size: 14px; max-width: 580px; margin: 0 auto;">
+                <code>inventory.nfsu.ac.in</code> separates read-only scholar research access from administrative custody dispatch workflows.
+            </p>
+        </div>
+
+        <div class="row">
+            <!-- 1. USER MODE CARD -->
+            <div class="col-md-6 col-sm-12" style="margin-bottom: 20px;">
+                <div class="nfsu-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #0284c7; padding: 25px; transition: transform 0.2s; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: #e0f2fe; color: #0369a1; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            {% if is_user %}
+                            <span class="badge-nfsu badge-nfsu-success">ACTIVE ROLE</span>
+                            {% endif %}
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 700; color: #002147; margin: 0 0 8px 0;">User Mode</h3>
+                        <div style="color: #0369a1; font-size: 12.5px; font-weight: 600; margin-bottom: 12px;">Forensic Scholar / Student Custodian</div>
+                        <p style="color: #475569; font-size: 13px; line-height: 1.5; margin-bottom: 15px;">
+                            Tailored for students, research scholars, and lab investigators. Browse equipment availability, review field kits, and submit workstation reservation requests.
+                        </p>
+                        <ul style="font-size: 12.5px; color: #64748b; padding-left: 18px; margin-bottom: 20px; line-height: 1.7;">
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Browse Hardware Catalog &amp; Specifications</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Real-Time Stock Shelf Availability</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Submit Lab Workstation Bookings</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Optical Barcode Tag &amp; RFID Scanner</li>
+                            <li><i class="fa fa-lock" style="color: #94a3b8; margin-right: 5px;"></i> <em>Equipment dispatch &amp; editing restricted</em></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <form method="post" action="{{ url_for('role_login') }}">
+                            <input type="hidden" name="role" value="user">
+                            <button type="submit" class="btn btn-block" style="background: #0284c7; color: #ffffff; font-weight: 700; padding: 10px; width: 100%; border-radius: 6px;">
+                                <i class="fas fa-sign-in-alt"></i> Enter as Forensic Scholar (User)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. EDITOR MODE CARD -->
+            <div class="col-md-6 col-sm-12" style="margin-bottom: 20px;">
+                <div class="nfsu-card" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #ddb55e; padding: 25px; transition: transform 0.2s; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: #002147; color: #ddb55e; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            {% if is_editor %}
+                            <span class="badge-nfsu badge-nfsu-navy" style="background: #ddb55e !important; color: #002147 !important;">ACTIVE ROLE</span>
+                            {% endif %}
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 700; color: #002147; margin: 0 0 8px 0;">Editor Mode</h3>
+                        <div style="color: #b45309; font-size: 12.5px; font-weight: 600; margin-bottom: 12px;">Laboratory In-Charge &amp; Custody Officer</div>
+                        <p style="color: #475569; font-size: 13px; line-height: 1.5; margin-bottom: 15px;">
+                            Full administrative privileges for laboratory staff and inventory managers to execute custody transfers, onboard hardware, log calibration, and assemble bundles.
+                        </p>
+                        <ul style="font-size: 12.5px; color: #64748b; padding-left: 18px; margin-bottom: 20px; line-height: 1.7;">
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Equipment Checkout &amp; Return Assessment</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Onboard Equipment &amp; Serialized Hardware</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Assemble &amp; Issue Forensic Field Kits</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> NABL ISO/IEC 17025 Calibration Tracking</li>
+                            <li><i class="fa fa-check" style="color: #16a34a; margin-right: 5px;"></i> Barcode Printing, CSV Exports &amp; Full Audit</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <form method="post" action="{{ url_for('role_login') }}">
+                            <input type="hidden" name="role" value="editor">
+                            <button type="submit" class="btn btn-nfsu-primary btn-block" style="font-weight: 700; padding: 10px; width: 100%; border-radius: 6px;">
+                                <i class="fas fa-key"></i> Enter as Lab In-Charge (Editor)
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
