@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ student.name }} ({{ student.enrolment_number }})</h2>
+<p class="muted">{{ student.programme }} • Semester {{ student.semester }} • {{ student.contact_details }}</p>
+
+<section class="panel">
+  <h3>Outstanding Issues</h3>
+  {% if outstanding %}
+    <table>
+      <thead><tr><th>Issue</th><th>Item</th><th>Outstanding</th><th>Due date</th><th>Status</th></tr></thead>
+      <tbody>
+      {% for record in outstanding %}
+        <tr>
+          <td>{{ record.issue_id }}</td>
+          <td>{{ record.item_code }}</td>
+          <td>{{ record.outstanding_quantity }}</td>
+          <td>{{ record.due_date }}</td>
+          <td>
+            {% if record.due_date < today %}
+              <span class="badge danger">Overdue</span>
+            {% else %}
+              <span class="badge success">Open</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No outstanding issues.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h3>All Issue Records</h3>
+  {% if records %}
+    <table>
+      <thead><tr><th>Issue</th><th>Item</th><th>Issued qty</th><th>Outstanding</th><th>Issued on</th><th>Due</th></tr></thead>
+      <tbody>
+      {% for record in records %}
+        <tr><td>{{ record.issue_id }}</td><td>{{ record.item_code }}</td><td>{{ record.quantity }}</td><td>{{ record.outstanding_quantity }}</td><td>{{ record.issue_date }}</td><td>{{ record.due_date }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No issue records found for this student.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">{{ 'Edit inventory item' if item else 'Add inventory item' }}</h2>
+<section class="panel">
+  <form method="post" class="grid-2">
+    <div>
+      <label for="code">Item code</label>
+      <input id="code" name="code" value="{{ item.code if item else '' }}" {{ 'readonly' if item else '' }} required />
+    </div>
+    <div>
+      <label for="name">Name</label>
+      <input id="name" name="name" value="{{ item.name if item else '' }}" required />
+    </div>
+    <div>
+      <label for="category">Category</label>
+      <input id="category" name="category" value="{{ item.category if item else '' }}" required />
+    </div>
+    <div>
+      <label for="make_model">Make/Model</label>
+      <input id="make_model" name="make_model" value="{{ item.make_model if item else '' }}" required />
+    </div>
+    <div>
+      <label for="total_quantity">Total quantity</label>
+      <input id="total_quantity" type="number" min="0" name="total_quantity" value="{{ item.total_quantity if item else 1 }}" required />
+    </div>
+    <div>
+      <label for="tracking_type">Tracking type</label>
+      {% if item %}
+        <input id="tracking_type" name="tracking_type" value="{{ item.tracking_type }}" readonly />
+      {% else %}
+        <select id="tracking_type" name="tracking_type">
+          <option value="quantity">Quantity</option>
+          <option value="asset">Asset</option>
+        </select>
+      {% endif %}
+    </div>
+    <div style="grid-column: 1/-1;">
+      <label for="description">Description</label>
+      <textarea id="description" name="description" required>{{ item.description if item else '' }}</textarea>
+    </div>
+    <div class="actions" style="grid-column: 1/-1;">
+      <button type="submit">Save</button>
+      <a href="{{ url_for('inventory_list') }}"><button type="button" class="secondary">Cancel</button></a>
+    </div>
+  </form>
+</section>
+{% endblock %}

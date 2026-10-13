@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Dashboard</h2>
+<div class="cards">
+  {% for key, label in [('total','Total'),('available','Available'),('issued','Issued'),('overdue','Overdue'),('damaged','Damaged'),('lost','Lost')] %}
+    <section class="card" aria-label="{{ label }} metric">
+      <div class="muted">{{ label }}</div>
+      <div class="metric">{{ metrics[key] }}</div>
+    </section>
+  {% endfor %}
+</div>
+
+<section class="panel">
+  <h3>Recent Activity</h3>
+  {% if recent_activity %}
+    <table>
+      <thead><tr><th>Date</th><th>Type</th><th>Item</th><th>Issue ID</th><th>Details</th></tr></thead>
+      <tbody>
+      {% for event in recent_activity|reverse %}
+        <tr>
+          <td>{{ event.date }}</td>
+          <td>{{ event.type.replace('_', ' ') }}</td>
+          <td>{{ event.item_code or '-' }}</td>
+          <td>{{ event.issue_id or '-' }}</td>
+          <td>{{ event.details }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No activity yet. Start by issuing an item.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h3>Overdue Items</h3>
+  {% if overdue_items %}
+    <table>
+      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Overdue Days</th></tr></thead>
+      <tbody>
+      {% for row in overdue_items %}
+        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.overdue_days }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No overdue issues.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h3>Due in 5 Days</h3>
+  {% if upcoming_items %}
+    <table>
+      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due Date</th></tr></thead>
+      <tbody>
+      {% for row in upcoming_items %}
+        <tr><td>{{ row.issue_id }}</td><td>{{ row.student_enrolment }}</td><td>{{ row.item_code }}</td><td>{{ row.outstanding_quantity }}</td><td>{{ row.due_date }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No upcoming returns in the next 5 days.</p>
+  {% endif %}
+</section>
+{% endblock %}

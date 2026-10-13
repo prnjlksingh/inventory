@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="page-title">Issue & Return Workflows</h2>
+
+<section class="panel">
+  <h3>Issue Item</h3>
+  <form method="post" class="grid-2">
+    <input type="hidden" name="action" value="issue" />
+    <div>
+      <label for="student_enrolment">Student</label>
+      <select id="student_enrolment" name="student_enrolment" required>
+        {% for student in students %}
+          <option value="{{ student.enrolment_number }}">{{ student.enrolment_number }} — {{ student.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item_code">Item</label>
+      <select id="item_code" name="item_code" required>
+        {% for item in items %}
+          <option value="{{ item.code }}">{{ item.code }} — {{ item.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="quantity">Quantity</label>
+      <input id="quantity" name="quantity" type="number" min="1" value="1" required />
+    </div>
+    <div>
+      <label for="asset_id">Asset ID (required for asset-tracked items)</label>
+      <input id="asset_id" name="asset_id" placeholder="e.g., DSLR-001" />
+    </div>
+    <div>
+      <label for="issue_date">Issue date</label>
+      <input id="issue_date" name="issue_date" type="date" />
+    </div>
+    <div>
+      <label for="staff">Issued by</label>
+      <input id="staff" name="staff" placeholder="Inventory Desk" />
+    </div>
+    <div style="grid-column: 1 / -1;">
+      <label for="purpose">Purpose</label>
+      <textarea id="purpose" name="purpose" required></textarea>
+    </div>
+    <div class="actions" style="grid-column: 1 / -1;">
+      <button type="submit">Issue item</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Record Return</h3>
+  <form method="post" class="grid-2">
+    <input type="hidden" name="action" value="return" />
+    <div>
+      <label for="issue_id">Open issue</label>
+      <select id="issue_id" name="issue_id" required>
+        {% for issue in open_issues %}
+          <option value="{{ issue.issue_id }}">{{ issue.issue_id }} — {{ issue.student_enrolment }} — {{ issue.item_code }} (outstanding {{ issue.outstanding_quantity }})</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="quantity_returned">Quantity returned</label>
+      <input id="quantity_returned" name="quantity_returned" type="number" min="1" value="1" required />
+    </div>
+    <div>
+      <label for="condition_on_return">Condition on return</label>
+      <select id="condition_on_return" name="condition_on_return" required>
+        {% for condition in conditions %}
+          <option value="{{ condition }}">{{ condition }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="return_date">Return date</label>
+      <input id="return_date" name="return_date" type="date" />
+    </div>
+    <div>
+      <label for="staff_return">Received by</label>
+      <input id="staff_return" name="staff" placeholder="Inventory Desk" />
+    </div>
+    <div class="actions" style="grid-column: 1 / -1;">
+      <button type="submit">Record return</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <h3>Open Issues Snapshot</h3>
+  {% if open_issues %}
+    <table>
+      <thead><tr><th>Issue</th><th>Student</th><th>Item</th><th>Outstanding</th><th>Due</th></tr></thead>
+      <tbody>
+      {% for issue in open_issues %}
+        <tr><td>{{ issue.issue_id }}</td><td>{{ issue.student_enrolment }}</td><td>{{ issue.item_code }}</td><td>{{ issue.outstanding_quantity }}</td><td>{{ issue.due_date }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="empty">No open issues currently.</p>
+  {% endif %}
+</section>
+{% endblock %}
