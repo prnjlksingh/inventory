@@ -30,6 +30,8 @@ class EnterpriseApiAndWebTests(unittest.TestCase):
             "/api/openapi.json",
             "/assets/css/bundle.css",
             "/assets/img/NFSU_logo.png",
+            "/assets/img/banner/12.jpg",
+            "/assets/img/preloader.gif",
             "/favicon.ico",
         ]
         for path in routes:
