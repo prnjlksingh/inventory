@@ -1,38 +1,163 @@
 {% extends "base.html" %}
 {% block title %}Central Laboratory Command Center{% endblock %}
-{% block page_title %}Central Forensic Laboratory Command Center{% endblock %}
-{% block breadcrumb_active %}Command Center{% endblock %}
 
 {% block content %}
-<!-- Quick Action Toolbar -->
-<div class="row" style="margin-bottom: 25px;">
-    <div class="col-md-8 col-sm-12">
-        <h2 style="color: #002147; font-size: 22px; font-weight: 700; margin: 0 0 6px 0;">
-            <i class="fas fa-university" style="color: #ddb55e; margin-right: 8px;"></i> National Forensic Asset & Evidence Ledger
-        </h2>
-        <p style="color: #64748b; font-size: 13.5px; margin: 0;">
-            Central Laboratory Telemetry &bull; <code>inventory.nfsu.ac.in</code> &bull; SCSDF, SFS, SBF, SET Laboratories
-        </p>
-    </div>
-    <div class="col-md-4 col-sm-12 text-right" style="margin-top: 8px;">
-        <a href="{{ url_for('transactions') }}" class="btn btn-nfsu-gold" style="margin-right: 6px;">
-            <i class="fas fa-exchange-alt"></i> New Custody Issue
-        </a>
-        <a href="{{ url_for('add_reservation') }}" class="btn btn-nfsu-primary" style="margin-right: 6px;">
-            <i class="fas fa-calendar-check"></i> Reserve
-        </a>
-        <a href="{{ url_for('kits_list') }}" class="btn btn-nfsu-outline">
-            <i class="fas fa-briefcase"></i> Kits
-        </a>
+<!-- 1. OFFICIAL HERO BANNER MATCHING NFSU -->
+<div class="row" style="margin-top: -10px; margin-bottom: 30px;">
+    <div class="col-md-12">
+        <div style="background: linear-gradient(135deg, rgba(0,33,71,0.92) 0%, rgba(0,23,51,0.96) 100%), url('/assets/img/banner/11.jpg') center/cover; padding: 50px 40px; border-radius: 8px; border-bottom: 4px solid #ddb55e; color: #ffffff; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+            <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+                <div class="col-md-8 col-sm-12">
+                    <span style="color: #ddb55e; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fas fa-university"></i> National Forensic Sciences University (NFSU)
+                    </span>
+                    <h1 style="color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 34px; font-weight: 800; line-height: 1.25; margin: 10px 0 14px 0;">
+                        <span style="color: #ddb55e;">The World's First </span><br>Forensic Sciences University
+                    </h1>
+                    <p style="color: #cbd5e1; font-size: 14.5px; max-width: 650px; line-height: 1.6; margin-bottom: 24px;">
+                        Central Forensic Laboratory &amp; Evidence Custody Infrastructure &bull; <code>inventory.nfsu.ac.in</code> &bull; An Institution of National Importance, Ministry of Home Affairs, Government of India.
+                    </p>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <a href="{{ url_for('inventory_list') }}" class="btn btn-nfsu-gold" style="padding: 10px 22px; font-size: 13px;">
+                            <i class="fas fa-microscope"></i> Explore Lab Inventory
+                        </a>
+                        <a href="{{ url_for('transactions') }}" class="btn" style="background: #ffffff; color: #002147; font-weight: 700; padding: 10px 22px; font-size: 13px;">
+                            <i class="fas fa-exchange-alt"></i> Custody Transfer
+                        </a>
+                        <a href="{{ url_for('add_reservation') }}" class="btn btn-nfsu-outline" style="border-color: #ddb55e; color: #ddb55e; padding: 10px 20px; font-size: 13px;">
+                            <i class="fas fa-calendar-check"></i> Book Station
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 text-center" style="margin-top: 15px;">
+                    <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 22px; backdrop-filter: blur(4px);">
+                        <img src="/assets/img/NFSU_logo.png" style="height: 85px; width: auto; margin-bottom: 12px;" alt="NFSU Crest">
+                        <div style="font-size: 12px; color: #ddb55e; font-weight: 700; letter-spacing: 0.5px;">CENTRAL LABORATORY DEPOT</div>
+                        <div style="font-size: 11px; color: #cbd5e1; margin-top: 4px;">Sector 9, Gandhinagar - 382007 (HQ)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- 6 STAT METRIC CARDS -->
-<div class="row">
+<!-- 2. VC MESSAGE & NOTICE BOARD (EXACT NATIVE NFSU CLASSES) -->
+<div class="message-area" style="background: #f9f9ff; padding: 25px 0; margin-bottom: 30px; border-radius: 8px; border: 1px solid #e2e8f0;">
+    <div class="container-fluid" style="padding: 0 20px;">
+        <div class="row">
+            <div class="col-md-8 col-sm-12 col-xs-12 pr5">
+                <div class="vcmgBox" style="background: #ffffff; padding: 15px; border-radius: 6px; border: 1px solid #e6d8c1;">
+                    <div class="vcPic">
+                        <img src="/assets/img/team/vc.jpg" class="img-responsive" alt="Prof. Dr. S. O. Junare">
+                    </div>
+                    <div class="vcMgText">
+                        <h4 style="color: #002147; font-weight: 700; font-size: 14px; margin-top: 0;">VICE CHANCELLOR DIRECTIVE</h4>
+                        <i class="fas fa-quote-left quotes" style="color: #ddb55e; font-size: 28px; opacity: 0.35;"></i>
+                        <p style="color: #334155; font-size: 13.5px; line-height: 1.5; font-style: italic; margin-bottom: 8px;">
+                            "Higher education is that which does not merely give us information but also makes our life harmonious. Ensure absolute integrity and chain-of-custody for all forensic evidence assets."
+                        </p>
+                        <h6 style="color: #002147; font-weight: 700; margin: 4px 0 2px 0;">- Prof. (Dr.) S. O. Junare</h6>
+                        <small style="color: #64748b; font-weight: 600;">Vice-Chancellor (I/C), National Forensic Sciences University</small>
+                        <div style="margin-top: 6px;">
+                            <a href="{{ url_for('students_list') }}" style="color: #ddb55e; font-weight: 700; font-size: 12px; text-decoration: none;">View Authorized Custodians <i class="fa fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12 col-xs-12 pl5">
+                <div class="noticeBoard" style="border-radius: 6px;">
+                    <h4>Laboratory Notice Board <span class="badge-nfsu badge-nfsu-navy" style="font-size: 10px; margin-left: 6px;">LIVE</span></h4>
+                    <marquee direction="up" scrollamount="2" onmouseover="this.stop()" onmouseout="this.start()" height="115" style="padding: 10px 8px;">
+                        <p><a href="{{ url_for('maintenance_list') }}" style="color: #cbd5e1;"><i class="fa fa-long-arrow-right" style="color: #ddb55e;"></i> <strong>NABL ISO/IEC 17025:</strong> Annual calibration cycle active across forensic laboratories.</a></p>
+                        <p><a href="{{ url_for('due_items') }}" style="color: #cbd5e1;"><i class="fa fa-long-arrow-right" style="color: #ddb55e;"></i> <strong>15-Day Custody Rule:</strong> Overdue equipment will be recalled with notice to Academic Council.</a></p>
+                        <p><a href="{{ url_for('inventory_list') }}" style="color: #cbd5e1;"><i class="fa fa-long-arrow-right" style="color: #ddb55e;"></i> <strong>Digital Forensics (SCSDF):</strong> New Tableau T8u WriteBlockers inducted into stock.</a></p>
+                    </marquee>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. KEY HIGHLIGHTS COUNTERS (EXACT NATIVE NFSU CLASSES) -->
+<div class="about-area default-padding" style="padding: 25px 0 35px 0; margin-bottom: 25px;">
+    <div class="row">
+        <div class="about-info why-area">
+            <div class="col-md-4 col-xs-12 info">
+                <h2 class="whyTitle"><span style="color: #ddb55e;">Key</span> Highlights</h2>
+                <p class="text-right" style="color: #64748b; font-size: 13px; line-height: 1.6;">
+                    The National Forensic Sciences University with the status of an Institution of National Importance is the world's first and only University dedicated to forensic sciences and cybersecurity.
+                </p>
+                <a class="btn border btn-md whybtn pull-right" href="https://nfsu.ac.in/why_nfsu" target="_blank"><i class="fa fa-long-arrow-right"></i></a>
+            </div>
+            <div class="col-md-8 col-xs-12">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>13+ Years</h4>
+                            <p>Excellence</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>16</h4>
+                            <p>Campuses</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>11</h4>
+                            <p>Schools</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>15</h4>
+                            <p>CoE/Centres</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>82</h4>
+                            <p>Programs</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>356</h4>
+                            <p>Faculty Members</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>107</h4>
+                            <p>International MoUs</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-6 plr-8">
+                        <div class="why-counter">
+                            <h4>177</h4>
+                            <p>National MoUs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. REAL-TIME TELEMETRY (6 STAT WIDGETS) -->
+<div class="row" style="margin-bottom: 25px;">
+    <div class="col-md-12">
+        <h3 style="color: #002147; font-size: 18px; font-weight: 700; margin: 0 0 15px 0;">
+            <i class="fas fa-chart-pie" style="color: #ddb55e; margin-right: 8px;"></i> Real-Time Forensic Equipment Telemetry
+        </h3>
+    </div>
     <div class="col-md-2 col-sm-4 col-xs-6">
         <div class="stat-widget" style="border-top: 3px solid #002147;">
             <div class="stat-widget-content">
-                <p>Total Assets</p>
+                <p>Total Units</p>
                 <h3>{{ metrics.total }}</h3>
                 <small style="color: #94a3b8; font-size: 11px;">All Schools</small>
             </div>
@@ -85,13 +210,13 @@
     </div>
 </div>
 
-<!-- FLEET UTILIZATION BAR -->
+<!-- 5. FLEET UTILIZATION PROGRESS BAR -->
 <div class="row" style="margin-bottom: 25px;">
     <div class="col-md-12">
-        <div class="nfsu-card" style="padding: 18px 22px; margin-bottom: 0; background: #ffffff; border-left: 5px solid #002147;">
+        <div class="nfsu-card" style="padding: 18px 24px; margin-bottom: 0; background: #ffffff; border-left: 5px solid #002147;">
             <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
                 <div class="col-md-3 col-sm-12">
-                    <span style="font-size: 11px; font-weight: 700; color: #002147; text-transform: uppercase; letter-spacing: 0.5px;">Forensic Fleet Utilization</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #002147; text-transform: uppercase; letter-spacing: 0.5px;">Fleet Utilization Rate</span>
                     <h2 style="margin: 0; font-size: 26px; font-weight: 800; color: #002147;">{{ analytics.utilization_rate }}%</h2>
                 </div>
                 <div class="col-md-5 col-sm-12" style="margin: 10px 0;">
@@ -109,237 +234,392 @@
     </div>
 </div>
 
-<!-- 2-COLUMN SECTION: OVERDUE ALERTS & UPCOMING DUE -->
-<div class="row">
-    <!-- OVERDUE DELINQUENT ITEMS -->
-    <div class="col-md-6 col-sm-12">
-        <div class="nfsu-card">
+<!-- 6. STUDY @ NFSU (EXACT NATIVE NFSU CLASSES & ICONS) -->
+<div class="what-learn-area bg-dark default-padding bg-fixed-footer shadow video-area dark-hard" style="padding: 40px 20px; margin-bottom: 30px; border-radius: 8px;">
+    <div class="container-fluid">
+        <div class="content-box">
+            <div class="row categories">
+                <div class="site-heading text-center" style="margin-bottom: 30px;">
+                    <h2 style="color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; margin: 0;">STUDY @NFSU</h2>
+                </div>
+                <!-- Single Item -->
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://nfsu.ac.in/campus" target="_blank">
+                            <img src="/assets/img/icons/school.png" alt="Campus" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Campus</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://nfsu.ac.in/programs" target="_blank">
+                            <img src="/assets/img/icons/program.png" alt="Program" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Program</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://nfsu.ac.in/Faculty" target="_blank">
+                            <img src="/assets/img/icons/admission.png" alt="Faculty" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Faculty</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://nfsu.ac.in/admission" target="_blank">
+                            <img src="/assets/img/icons/affiliation.png" alt="Admission" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Admission</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://nfsu.ac.in/affiliationcolg" target="_blank">
+                            <img src="/assets/img/icons/consultatancy.png" alt="Affiliation" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Affiliation</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-4 col-xs-6 single-item">
+                    <div class="item text-center">
+                        <a href="https://alumni.nfsu.ac.in/" target="_blank">
+                            <img src="/assets/img/icons/alumni.png" alt="Alumni" style="height: 50px; margin: 0 auto 10px auto;">
+                            <div class="info">
+                                <h4 style="color: #ffffff; font-size: 14px;">Alumni</h4>
+                                <span style="color: #ddb55e; font-size: 11px;">Read More</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.12); margin: 25px 0;">
+            <div class="row mt-30">
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 12px;">
+                    <a class="uniBox" href="https://nfsu.ac.in/academic" target="_blank" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 6px; text-decoration: none;">
+                        <img src="/assets/img/icons/academic.png" style="height: 38px;" alt="Academic">
+                        <span style="color: #ffffff; font-weight: 700; font-size: 13.5px;">Academic</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 12px;">
+                    <a class="uniBox" href="https://nfsu.ac.in/research" target="_blank" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 6px; text-decoration: none;">
+                        <img src="/assets/img/icons/research.png" style="height: 38px;" alt="Research">
+                        <span style="color: #ffffff; font-weight: 700; font-size: 13.5px;">Research</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 12px;">
+                    <a class="uniBox" href="https://nfsu.ac.in/training" target="_blank" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 6px; text-decoration: none;">
+                        <img src="/assets/img/icons/training.png" style="height: 38px;" alt="Training">
+                        <span style="color: #ffffff; font-weight: 700; font-size: 13.5px;">Training</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-6 col-xs-12" style="margin-bottom: 12px;">
+                    <a class="uniBox" href="https://beta.nfsu.ac.in/Uploads/Consultancy_Work.pdf" target="_blank" style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 6px; text-decoration: none;">
+                        <img src="/assets/img/icons/consultatancy.png" style="height: 38px;" alt="Consultancy">
+                        <span style="color: #ffffff; font-weight: 700; font-size: 13.5px;">Consultancy</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 7. OPERATIONAL AUDIT: OVERDUE ALERTS & UPCOMING DUE -->
+<div class="row" style="margin-bottom: 25px;">
+    <!-- Overdue Table -->
+    <div class="col-md-6 col-sm-12" style="margin-bottom: 15px;">
+        <div class="nfsu-card" style="height: 100%;">
             <div class="nfsu-card-header" style="border-left: 4px solid #dc2626;">
-                <h4 style="color: #dc2626;"><i class="fas fa-exclamation-triangle"></i> Overdue Equipment Recall Alerts</h4>
-                <a href="{{ url_for('due_items') }}" class="btn btn-xs btn-default">Full Recall List</a>
+                <h4 style="color: #dc2626; margin: 0; font-size: 15px;">
+                    <i class="fas fa-exclamation-triangle"></i> Delinquent Overdue Dispatches ({{ overdue_items|length }})
+                </h4>
+                <a href="{{ url_for('due_items') }}" class="btn btn-sm btn-nfsu-outline">View All</a>
             </div>
             <div class="nfsu-card-body" style="padding: 0;">
                 {% if overdue_items %}
-                    <div class="table-responsive">
-                        <table class="table table-nfsu">
-                            <thead>
-                                <tr>
-                                    <th>Issue ID</th>
-                                    <th>Scholar</th>
-                                    <th>SKU</th>
-                                    <th>Qty</th>
-                                    <th>Delay</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in overdue_items %}
-                                <tr>
-                                    <td><code>{{ row.issue_id }}</code></td>
-                                    <td><a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 700;">{{ row.student_enrolment }}</a></td>
-                                    <td><strong>{{ row.item_code }}</strong></td>
-                                    <td><span class="badge-nfsu badge-nfsu-warning">{{ row.outstanding_quantity }}</span></td>
-                                    <td><span class="badge-nfsu badge-nfsu-danger">+{{ row.overdue_days }}d overdue</span></td>
-                                    <td>
-                                        <a href="{{ url_for('transactions') }}" class="btn btn-xs btn-nfsu-primary">Receive</a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-nfsu">
+                        <thead>
+                            <tr>
+                                <th>Item / Equipment</th>
+                                <th>Custodian</th>
+                                <th>Overdue Date</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in overdue_items[:5] %}
+                            <tr>
+                                <td>
+                                    <strong>{{ row.item_code }}</strong>
+                                    <br><small style="color: #64748b;">Issue: <code>{{ row.issue_id }}</code></small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 600;">
+                                        {{ row.student_enrolment }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge-nfsu badge-nfsu-danger">{{ row.due_date }}</span>
+                                    <br><small style="color: #dc2626;">+{{ row.overdue_days }}d overdue</small>
+                                </td>
+                                <td class="text-right">
+                                    <a href="{{ url_for('transactions') }}" class="btn btn-sm btn-nfsu-primary">Return</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 {% else %}
-                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
-                        <i class="fas fa-check-circle" style="color: #16a34a; font-size: 24px; margin-bottom: 8px;"></i><br>
-                        All hardware returned on schedule. Zero chain-of-custody delinquency.
-                    </div>
+                <div style="padding: 30px; text-align: center; color: #16a34a;">
+                    <i class="fas fa-check-circle" style="font-size: 28px; margin-bottom: 8px;"></i>
+                    <p style="margin: 0; font-weight: 600;">All equipment is within authorized custody duration.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- UPCOMING DUE -->
-    <div class="col-md-6 col-sm-12">
-        <div class="nfsu-card">
-            <div class="nfsu-card-header" style="border-left: 4px solid #0284c7;">
-                <h4 style="color: #002147;"><i class="fas fa-clock"></i> Returns Expected in Next 5 Days</h4>
-                <a href="{{ url_for('due_items') }}" class="btn btn-xs btn-default">Calendar</a>
+    <!-- Upcoming Returns -->
+    <div class="col-md-6 col-sm-12" style="margin-bottom: 15px;">
+        <div class="nfsu-card" style="height: 100%;">
+            <div class="nfsu-card-header" style="border-left: 4px solid #002147;">
+                <h4 style="margin: 0; font-size: 15px;">
+                    <i class="fas fa-calendar-alt"></i> Upcoming Expected Returns ({{ upcoming_items|length }})
+                </h4>
+                <a href="{{ url_for('transactions') }}" class="btn btn-sm btn-secondary">Custody Ledger</a>
             </div>
             <div class="nfsu-card-body" style="padding: 0;">
                 {% if upcoming_items %}
-                    <div class="table-responsive">
-                        <table class="table table-nfsu">
-                            <thead>
-                                <tr>
-                                    <th>Issue ID</th>
-                                    <th>Scholar</th>
-                                    <th>Equipment</th>
-                                    <th>Qty</th>
-                                    <th>Due Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for row in upcoming_items %}
-                                <tr>
-                                    <td><code>{{ row.issue_id }}</code></td>
-                                    <td><a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 700;">{{ row.student_enrolment }}</a></td>
-                                    <td><strong>{{ row.item_code }}</strong></td>
-                                    <td>{{ row.outstanding_quantity }}</td>
-                                    <td><span class="badge-nfsu badge-nfsu-info">{{ row.due_date }}</span></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-nfsu">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Custodian</th>
+                                <th>Expected Return</th>
+                                <th class="text-right">Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in upcoming_items[:5] %}
+                            <tr>
+                                <td>
+                                    <strong>{{ row.item_code }}</strong>
+                                    <br><small style="color: #64748b;">Issue: <code>{{ row.issue_id }}</code></small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('student_detail', enrolment=row.student_enrolment) }}" style="color: #002147; font-weight: 600;">
+                                        {{ row.student_enrolment }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge-nfsu badge-nfsu-info">{{ row.due_date }}</span>
+                                </td>
+                                <td class="text-right">
+                                    <span class="badge-nfsu badge-nfsu-navy">{{ row.outstanding_quantity }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 {% else %}
-                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
-                        No upcoming returns scheduled in the next 5 days.
-                    </div>
+                <div style="padding: 30px; text-align: center; color: #64748b;">
+                    <i class="fas fa-clipboard-check" style="font-size: 28px; margin-bottom: 8px;"></i>
+                    <p style="margin: 0; font-weight: 600;">No items scheduled for return today.</p>
+                </div>
                 {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<!-- 2-COLUMN SECTION: APPROVED BOOKINGS & CHAIN OF CUSTODY ACTIVITY -->
-<div class="row">
-    <!-- RESERVATIONS -->
-    <div class="col-md-6 col-sm-12">
-        <div class="nfsu-card">
-            <div class="nfsu-card-header">
-                <h4><i class="fas fa-calendar-check" style="color: #ddb55e;"></i> Approved Laboratory Bookings</h4>
-                <a href="{{ url_for('reservations_list') }}" class="btn btn-xs btn-default">All Bookings</a>
-            </div>
-            <div class="nfsu-card-body" style="padding: 0;">
-                {% if active_reservations %}
-                    <div class="table-responsive">
-                        <table class="table table-nfsu">
-                            <thead>
-                                <tr>
-                                    <th>Booking ID</th>
-                                    <th>Scholar</th>
-                                    <th>Equipment</th>
-                                    <th>Schedule</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for res in active_reservations %}
-                                <tr>
-                                    <td><code>{{ res.reservation_id }}</code></td>
-                                    <td>{{ res.student_enrolment }}</td>
-                                    <td><strong>{{ res.item_code }}</strong> ({{ res.quantity }})</td>
-                                    <td style="font-size: 12px;">{{ res.start_date }} &rarr; {{ res.end_date }}</td>
-                                    <td><span class="badge-nfsu badge-nfsu-success">{{ res.status }}</span></td>
-                                    <td>
-                                        {% if res.status in ['pending', 'approved'] %}
-                                            <form method="post" action="{{ url_for('fulfill_reservation_view', res_id=res.reservation_id) }}" style="display:inline;">
-                                                <button type="submit" class="btn btn-xs btn-nfsu-primary">Issue</button>
-                                            </form>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
-                        No active laboratory reservations.
-                    </div>
-                {% endif %}
+<!-- 8. LEADERSHIP TESTIMONIALS (EXACT NFSU QUOTES & PHOTOS) -->
+<div class="testimonials-area carousel-shadow default-padding bg-dark text-light" style="padding: 40px 20px; margin-bottom: 30px; border-radius: 8px;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="site-heading text-center" style="margin-bottom: 25px;">
+                <h2 style="color: #ffffff; font-family: 'Poppins', sans-serif; font-size: 24px; font-weight: 700; margin: 0;">Leadership Testimonials</h2>
             </div>
         </div>
-    </div>
-
-    <!-- CHAIN OF CUSTODY AUDIT ACTIVITY -->
-    <div class="col-md-6 col-sm-12">
-        <div class="nfsu-card">
-            <div class="nfsu-card-header">
-                <h4><i class="fas fa-history" style="color: #002147;"></i> Chain of Custody Activity Ledger</h4>
-                <a href="{{ url_for('history') }}" class="btn btn-xs btn-default">Full Ledger</a>
-            </div>
-            <div class="nfsu-card-body" style="padding: 0;">
-                {% if recent_activity %}
-                    <div class="table-responsive">
-                        <table class="table table-nfsu">
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Custody Action</th>
-                                    <th>Equipment / Voucher</th>
-                                    <th>Officer / Tech</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for event in recent_activity|reverse %}
-                                <tr>
-                                    <td style="font-size: 12px; color: #64748b;">{{ event.date }}</td>
-                                    <td>
-                                        <span class="badge-nfsu badge-nfsu-navy">{{ event.type.replace('_', ' ') }}</span>
-                                    </td>
-                                    <td>
-                                        {% if event.item_code %}
-                                            <strong>{{ event.item_code }}</strong>
-                                        {% endif %}
-                                        {% if event.issue_id %}
-                                            <a href="{{ url_for('issue_receipt', issue_id=event.issue_id) }}" style="color: #c8131a; margin-left: 4px; font-weight: 700;" title="Print Voucher">#{{ event.issue_id }}</a>
-                                        {% endif %}
-                                    </td>
-                                    <td style="font-size: 12.5px; font-weight: 600;">{{ event.responsible_user }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+        <div class="row">
+            <div class="col-md-6 col-sm-12" style="margin-bottom: 15px;">
+                <div style="background: rgba(255,255,255,0.06); padding: 22px; border-radius: 8px; border-left: 4px solid #ddb55e; display: flex; gap: 18px; align-items: center;">
+                    <div style="flex-shrink: 0;">
+                        <img src="/assets/img/modiji.jpg" alt="Shri Narendra Modi" style="width: 85px; height: 85px; border-radius: 50%; border: 3px solid #ddb55e; object-fit: cover;">
                     </div>
-                {% else %}
-                    <div style="padding: 25px; text-align: center; color: #64748b; font-style: italic;">
-                        No recent custody activity recorded.
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- NFSU CAMPUS NETWORK & LEADERSHIP BANNER -->
-<div class="row" style="margin-top: 15px;">
-    <div class="col-md-12">
-        <div class="nfsu-card" style="background: linear-gradient(135deg, #002147 0%, #001733 100%); color: #ffffff; padding: 25px 30px;">
-            <div class="row">
-                <div class="col-md-7">
-                    <h4 style="color: #ddb55e; font-weight: 700; margin-top: 0; font-size: 17px;">
-                        <i class="fas fa-map-marked-alt"></i> NFSU Pan-India Forensic Laboratory Network
-                    </h4>
-                    <p style="color: #cbd5e1; font-size: 13px; line-height: 1.6; margin-bottom: 12px;">
-                        Connecting Central Laboratories across 16 Campuses under the Ministry of Home Affairs, Government of India:
-                    </p>
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                        <span class="badge-nfsu" style="background: rgba(221, 181, 94, 0.2); color: #ddb55e; border: 1px solid #ddb55e;">Gujarat (HQ)</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Delhi</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Goa</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Tripura</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Bhopal</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Pune</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Guwahati</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Manipur</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Dharwad</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Uganda</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Bhubaneswar</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Chennai</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Jaipur</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Nagpur</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Raipur</span>
-                        <span class="badge-nfsu" style="background: rgba(255,255,255,0.1); color: #fff;">Varanasi</span>
+                    <div>
+                        <p style="color: #cbd5e1; font-style: italic; font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+                            "I'm confident that the knowledge you've acquired at the NFSU will help you serve the country effectively and broaden the horizon of your professional success."
+                        </p>
+                        <h4 style="color: #ffffff; margin: 0; font-size: 15px; font-weight: 700;">Shri Narendra Modi</h4>
+                        <span style="color: #ddb55e; font-size: 11.5px; font-weight: 600;">Hon'ble Prime Minister of India</span>
                     </div>
                 </div>
-                <div class="col-md-5" style="border-left: 1px solid rgba(255,255,255,0.1); padding-left: 25px;">
-                    <div style="font-style: italic; color: #e2e8f0; font-size: 13px; margin-bottom: 8px;">
-                        "NFSU देश के क्रिमिनल जस्टिस सिस्टम के कायाकल्प में अहम भूमिका निभा रही है। इसलिए देश की कानून व्यवस्था को और मजबूत व परिणामलक्षी बनाने हेतु भारत सरकार देश में NFSU कैंपस का जाल बुन रही है।"
+            </div>
+            <div class="col-md-6 col-sm-12" style="margin-bottom: 15px;">
+                <div style="background: rgba(255,255,255,0.06); padding: 22px; border-radius: 8px; border-left: 4px solid #ddb55e; display: flex; gap: 18px; align-items: center;">
+                    <div style="flex-shrink: 0;">
+                        <img src="/assets/img/Amit-shah.jpg" alt="Shri Amitbhai Shah" style="width: 85px; height: 85px; border-radius: 50%; border: 3px solid #ddb55e; object-fit: cover;">
                     </div>
-                    <div style="font-size: 12px; font-weight: 700; color: #ddb55e;">— Shri Amitbhai Shah</div>
-                    <div style="font-size: 11px; color: #94a3b8;">Minister of Home Affairs, Government of India</div>
+                    <div>
+                        <p style="color: #cbd5e1; font-style: italic; font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+                            "NFSU देश के क्रिमिनल जस्टिस सिस्टम के कायाकल्प में अहम भूमिका निभा रही है। इसलिए देश की कानून व्यवस्था को और मजबूत व परिणामलक्षी बनाने हेतु भारत सरकार देश में NFSU कैंपस का जाल बुन रही है।"
+                        </p>
+                        <h4 style="color: #ffffff; margin: 0; font-size: 15px; font-weight: 700;">Shri Amitbhai Shah</h4>
+                        <span style="color: #ddb55e; font-size: 11.5px; font-weight: 600;">Minister of Home Affairs of India</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 9. PAN-INDIA & GLOBAL CAMPUSES NETWORK (ALL 16 CAMPUSES WITH OFFICIAL MAP ICONS) -->
+<div class="row" style="margin-bottom: 30px;">
+    <div class="col-md-12">
+        <div class="nfsu-card" style="padding: 24px; border-top: 4px solid #002147;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #edf2f7; padding-bottom: 12px;">
+                <h3 style="margin: 0; font-size: 18px; font-weight: 700; color: #002147;">
+                    <i class="fas fa-map-marked-alt" style="color: #ddb55e; margin-right: 8px;"></i> Pan-India &amp; Global Campus Network (16 Campuses)
+                </h3>
+                <span class="badge-nfsu badge-nfsu-navy">INVENTORY DEPLOYMENTS</span>
+            </div>
+            <div class="row">
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://gujarat.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/guj_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Gujarat">
+                        <div><strong style="font-size: 13px;">Gujarat</strong><br><small style="color: #64748b;">Gandhinagar HQ</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://delhi.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Delhi_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Delhi">
+                        <div><strong style="font-size: 13px;">Delhi</strong><br><small style="color: #64748b;">Rohini Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://goa.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Goa_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Goa">
+                        <div><strong style="font-size: 13px;">Goa</strong><br><small style="color: #64748b;">Ponda Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://tripura.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Tripura_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Tripura">
+                        <div><strong style="font-size: 13px;">Tripura</strong><br><small style="color: #64748b;">Agartala Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://bhopal.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/bhopal_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Bhopal">
+                        <div><strong style="font-size: 13px;">Bhopal</strong><br><small style="color: #64748b;">MP Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://pune.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/pune_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Pune">
+                        <div><strong style="font-size: 13px;">Pune</strong><br><small style="color: #64748b;">Maharashtra</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://guwahati.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/guwahati_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Guwahati">
+                        <div><strong style="font-size: 13px;">Guwahati</strong><br><small style="color: #64748b;">Assam Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://manipur.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/manipur_map.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Manipur">
+                        <div><strong style="font-size: 13px;">Manipur</strong><br><small style="color: #64748b;">Imphal Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://dharwad.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/dharwad.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Dharwad">
+                        <div><strong style="font-size: 13px;">Dharwad</strong><br><small style="color: #64748b;">Karnataka Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://uganda.nfsu.ac.in" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/uganda.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Uganda">
+                        <div><strong style="font-size: 13px;">Uganda</strong><br><small style="color: #64748b;">Jinja (International)</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://bhubaneswar.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Bhubaneswar.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Bhubaneswar">
+                        <div><strong style="font-size: 13px;">Bhubaneswar</strong><br><small style="color: #64748b;">Odisha Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://chennai.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Chennai.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Chennai">
+                        <div><strong style="font-size: 13px;">Chennai</strong><br><small style="color: #64748b;">Tamil Nadu Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://jaipur.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Jaipur.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Jaipur">
+                        <div><strong style="font-size: 13px;">Jaipur</strong><br><small style="color: #64748b;">Rajasthan Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://nagpur.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Nagpur.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Nagpur">
+                        <div><strong style="font-size: 13px;">Nagpur</strong><br><small style="color: #64748b;">Maharashtra Campus</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://raipur.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/Raipur.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Raipur">
+                        <div><strong style="font-size: 13px;">Raipur</strong><br><small style="color: #64748b;">Chhattisgarh</small></div>
+                    </a>
+                </div>
+                <div class="col-md-3 col-sm-4 col-xs-6" style="margin-bottom: 14px;">
+                    <a target="_blank" href="https://varanasi.nfsu.ac.in/" style="display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #e2e8f0; border-radius: 6px; text-decoration: none; color: #002147;">
+                        <img src="/assets/img/map/varansi.png" style="height: 38px; width: 38px; object-fit: contain;" alt="Varanasi">
+                        <div><strong style="font-size: 13px;">Varanasi</strong><br><small style="color: #64748b;">Uttar Pradesh Campus</small></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 10. OUR PARTNERS (OFFICIAL NFSU CLIENT LOGOS) -->
+<div class="clients-area default-padding bg-gray" style="background: #f1f5f9; padding: 25px 20px; border-radius: 8px; margin-bottom: 20px;">
+    <div class="container-fluid">
+        <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
+            <div class="col-md-3 info site-heading mb0">
+                <h2 style="font-size: 20px; color: #002147; font-weight: 700; margin: 0;">Our Partners <i class="fa fa-long-arrow-right" aria-hidden="true" style="color: #ddb55e;"></i></h2>
+            </div>
+            <div class="col-md-9 clients">
+                <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px;">
+                    <div><img src="/assets/img/clients/1.png" alt="Partner 1" style="max-height: 42px; opacity: 0.85;"></div>
+                    <div><img src="/assets/img/clients/2.png" alt="Partner 2" style="max-height: 42px; opacity: 0.85;"></div>
+                    <div><img src="/assets/img/clients/3.png" alt="Partner 3" style="max-height: 42px; opacity: 0.85;"></div>
+                    <div><img src="/assets/img/clients/4.png" alt="Partner 4" style="max-height: 42px; opacity: 0.85;"></div>
+                    <div><img src="/assets/img/clients/5.png" alt="Partner 5" style="max-height: 42px; opacity: 0.85;"></div>
                 </div>
             </div>
         </div>

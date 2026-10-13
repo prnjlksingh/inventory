@@ -33,13 +33,17 @@
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 
     <style>
-      /* NFSU EXACT THEME ENHANCEMENTS */
+      /* NFSU EXACT THEME ENHANCEMENTS & OVERLAP PREVENTION */
       :root {
         --nfsu-navy: #002147;
         --nfsu-navy-dark: #001733;
         --nfsu-gold: #ddb55e;
         --nfsu-gold-hover: #c89e47;
         --nfsu-red: #c8131a;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
@@ -49,6 +53,8 @@
         min-height: 100vh;
         display: flex;
         flex-direction: column;
+        margin: 0;
+        padding: 0;
       }
 
       h1, h2, h3, h4, h5, h6, .navbar, .top-bar-area {
@@ -62,162 +68,263 @@
         width: 100%;
       }
 
-      /* Top Bar */
-      .top-bar-area.bg-dark {
+      /* TOP BAR EXACT STYLING */
+      .top-bar-area {
         background-color: #001733 !important;
-        border-bottom: 1px solid rgba(255,255,255,0.08);
+        border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+        padding: 7px 0 !important;
+        position: relative !important;
+        z-index: 1001 !important;
+        display: block !important;
+      }
+      .top-bar-area .container {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+      }
+      .top-bar-area .info ul {
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
       }
       .top-bar-area .info ul li {
-        color: #e2e8f0;
-        font-size: 13px;
-        margin-right: 18px;
-        display: inline-block;
+        color: #e2e8f0 !important;
+        font-size: 12.5px !important;
+        margin-right: 18px !important;
+        display: inline-block !important;
       }
       .top-bar-area .info ul li i {
-        color: #ddb55e;
-        margin-right: 6px;
+        color: #ddb55e !important;
+        margin-right: 5px !important;
       }
-      .top-bar-area .user-login a {
-        background: transparent;
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 600;
-        padding: 4px 10px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.2s ease;
+      .top-bar-area .user-login {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 12px !important;
+        margin: 0 !important;
+        float: none !important;
       }
-      .top-bar-area .user-login a:hover {
-        background: #ddb55e;
-        color: #002147;
+      .btn-topbar-action {
+        background: #ffffff !important;
+        color: #002147 !important;
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        padding: 4px 12px !important;
+        border-radius: 20px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.4px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+        float: none !important;
+      }
+      .btn-topbar-action:hover {
+        background: #ddb55e !important;
+        color: #001733 !important;
+        text-decoration: none !important;
+      }
+      .topHeaderLinks {
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        float: none !important;
+      }
+      .topHeaderLinks li {
+        display: inline-block !important;
+        float: none !important;
       }
       .topHeaderLinks li a {
-        color: #cbd5e1;
-        font-size: 12px;
+        color: #cbd5e1 !important;
+        font-size: 11.5px !important;
+        padding: 2px 10px !important;
+        border-right: 1px solid rgba(255,255,255,0.2) !important;
+        background: transparent !important;
+        text-decoration: none !important;
+        float: none !important;
+      }
+      .topHeaderLinks li:last-child a {
+        border-right: none !important;
       }
       .topHeaderLinks li a:hover {
-        color: #ddb55e;
+        color: #ddb55e !important;
       }
 
-      /* Navbar */
+      /* HEADER & NAVBAR EXACT REPLICATION WITH ZERO OVERLAP */
+      header#home {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 10000 !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        border-bottom: 3px solid #002147 !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.06) !important;
+      }
       nav.navbar.bootsnav {
-        background-color: #ffffff;
-        border-bottom: 3px solid #002147;
-        margin-bottom: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        background-color: #ffffff !important;
+        border: none !important;
+        margin-bottom: 0 !important;
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        box-shadow: none !important;
+      }
+      nav.navbar.bootsnav.navbar-fixed {
+        position: static !important;
+        top: auto !important;
+        left: auto !important;
+        box-shadow: none !important;
+      }
+      nav.navbar.bootsnav .container {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+      }
+      nav.navbar.bootsnav .navbar-header {
+        display: flex !important;
+        align-items: center !important;
+        float: none !important;
       }
       nav.navbar.bootsnav .navbar-brand {
-        padding: 10px 15px;
-        height: auto;
+        padding: 6px 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
       }
-      nav.navbar.bootsnav .navbar-brand img {
-        height: 64px;
-        width: auto;
+      nav.navbar.bootsnav .navbar-brand img.logo {
+        height: 52px !important;
+        max-height: 52px !important;
+        width: auto !important;
+        display: inline-block !important;
+      }
+      nav.navbar.bootsnav .navbar-collapse {
+        border-top: 0 !important;
+        box-shadow: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        float: right !important;
+      }
+      nav.navbar.bootsnav ul.nav.navbar-nav {
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        float: none !important;
+      }
+      nav.navbar.bootsnav ul.nav > li {
+        display: inline-block !important;
+        float: none !important;
       }
       nav.navbar.bootsnav ul.nav > li > a {
-        color: #002147;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        padding: 30px 14px !important;
-        letter-spacing: 0.3px;
-        transition: color 0.2s;
+        color: #002147 !important;
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        padding: 20px 8px !important;
+        letter-spacing: 0.2px !important;
+        white-space: nowrap !important;
+        transition: color 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 3px !important;
       }
       nav.navbar.bootsnav ul.nav > li > a:hover,
       nav.navbar.bootsnav ul.nav > li.active > a {
         color: #ddb55e !important;
-      }
-      nav.navbar.bootsnav .admissionBtn a {
-        background-color: #002147;
-        color: #ffffff !important;
-        font-weight: 700;
-        font-size: 12px;
-        padding: 8px 16px;
-        border-radius: 30px;
-        border: 2px solid #ddb55e;
-        text-transform: uppercase;
-        display: inline-block;
-        margin-top: 22px;
-        transition: all 0.2s ease;
-      }
-      nav.navbar.bootsnav .admissionBtn a:hover {
-        background-color: #ddb55e;
-        color: #002147 !important;
+        background-color: transparent !important;
       }
 
       /* Hover dropdowns in desktop */
       @media (min-width: 768px) {
         .navbar-nav > li:hover > .dropdown-menu {
-          display: block;
-          margin-top: 0;
+          display: block !important;
+          margin-top: 0 !important;
         }
       }
       .dropdown-menu {
-        border-radius: 4px;
-        border-top: 3px solid #ddb55e;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-        padding: 6px 0;
+        border-radius: 4px !important;
+        border: none !important;
+        border-top: 3px solid #ddb55e !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+        padding: 6px 0 !important;
       }
       .dropdown-menu > li > a {
-        font-size: 13px;
-        font-weight: 600;
-        color: #002147;
-        padding: 9px 20px;
+        font-family: 'Open Sans', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: #002147 !important;
+        padding: 9px 20px !important;
+        display: flex !important;
+        align-items: center !important;
       }
       .dropdown-menu > li > a i {
-        color: #ddb55e;
-        width: 18px;
-        margin-right: 8px;
+        color: #ddb55e !important;
+        width: 18px !important;
+        margin-right: 8px !important;
       }
       .dropdown-menu > li > a:hover {
-        background-color: #002147;
-        color: #ffffff;
+        background-color: #002147 !important;
+        color: #ffffff !important;
       }
       .dropdown-menu > li > a:hover i {
-        color: #ffffff;
+        color: #ffffff !important;
       }
 
-      /* Breadcrumb Header Area */
+      /* BREADCRUMB BANNER */
       .breadcrumb-area {
-        background-color: #002147;
-        background-image: linear-gradient(135deg, rgba(0,33,71,0.96) 0%, rgba(0,23,51,0.98) 100%);
-        padding: 38px 0 30px 0;
-        border-bottom: 4px solid #ddb55e;
+        background-color: #002147 !important;
+        background-image: linear-gradient(135deg, rgba(0,33,71,0.96) 0%, rgba(0,23,51,0.98) 100%) !important;
+        padding: 38px 0 30px 0 !important;
+        border-bottom: 4px solid #ddb55e !important;
+        position: relative !important;
       }
       .breadcrumb-area h1 {
-        color: #ffffff;
-        font-size: 26px;
-        font-weight: 700;
-        margin-top: 0;
-        margin-bottom: 8px;
+        color: #ffffff !important;
+        font-family: 'Poppins', sans-serif !important;
+        font-size: 26px !important;
+        font-weight: 700 !important;
+        margin-top: 0 !important;
+        margin-bottom: 8px !important;
       }
       .breadcrumb-area .breadcrumb {
-        background: transparent;
-        margin: 0;
-        padding: 0;
-        font-size: 13px;
+        background: transparent !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 13px !important;
       }
       .breadcrumb-area .breadcrumb li,
       .breadcrumb-area .breadcrumb li a {
-        color: #cbd5e1;
+        color: #cbd5e1 !important;
       }
       .breadcrumb-area .breadcrumb li a:hover {
-        color: #ddb55e;
+        color: #ddb55e !important;
       }
       .breadcrumb-area .breadcrumb li.active {
-        color: #ddb55e;
-        font-weight: 600;
+        color: #ddb55e !important;
+        font-weight: 600 !important;
       }
 
-      /* Main container wrapper */
+      /* MAIN CONTAINER */
       .main-content {
         flex: 1 0 auto;
         padding: 35px 0 50px 0;
+        position: relative;
       }
 
       /* NFSU Card & Panel Styles */
-      .nfsu-card {
+      .nfsu-card, .panel {
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 8px;
@@ -225,7 +332,7 @@
         margin-bottom: 25px;
         overflow: hidden;
       }
-      .nfsu-card-header {
+      .nfsu-card-header, .panel-header {
         background: #ffffff;
         border-bottom: 2px solid #edf2f7;
         padding: 16px 22px;
@@ -233,64 +340,78 @@
         justify-content: space-between;
         align-items: center;
       }
-      .nfsu-card-header h3, .nfsu-card-header h4 {
+      .nfsu-card-header h3, .nfsu-card-header h4, .panel-title {
         margin: 0;
         color: #002147;
         font-size: 17px;
         font-weight: 700;
+        font-family: 'Poppins', sans-serif;
       }
       .nfsu-card-body {
         padding: 22px;
       }
 
       /* Buttons matching NFSU Palette */
-      .btn-nfsu-primary {
+      .btn {
+        border-radius: 4px;
+        font-family: 'Poppins', sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 7px 14px;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-nfsu-primary, .btn-primary {
         background-color: #002147 !important;
         border-color: #002147 !important;
         color: #ffffff !important;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        border-radius: 4px;
-        transition: all 0.2s;
       }
-      .btn-nfsu-primary:hover {
+      .btn-nfsu-primary:hover, .btn-primary:hover {
         background-color: #001733 !important;
         border-color: #001733 !important;
         color: #ddb55e !important;
       }
-      .btn-nfsu-gold {
+      .btn-nfsu-gold, .btn-accent {
         background-color: #ddb55e !important;
         border-color: #cdad68 !important;
         color: #002147 !important;
-        font-family: 'Poppins', sans-serif;
         font-weight: 700;
-        border-radius: 4px;
-        transition: all 0.2s;
       }
-      .btn-nfsu-gold:hover {
+      .btn-nfsu-gold:hover, .btn-accent:hover {
         background-color: #c89e47 !important;
         color: #001733 !important;
       }
-      .btn-nfsu-outline {
+      .btn-nfsu-outline, .btn-outline {
         background-color: transparent !important;
         border: 1px solid #002147 !important;
         color: #002147 !important;
-        font-weight: 600;
-        border-radius: 4px;
       }
-      .btn-nfsu-outline:hover {
+      .btn-nfsu-outline:hover, .btn-outline:hover {
         background-color: #002147 !important;
         color: #ffffff !important;
       }
+      .btn-secondary, .btn-default {
+        background-color: #f1f5f9 !important;
+        border-color: #cbd5e1 !important;
+        color: #002147 !important;
+      }
+      .btn-secondary:hover, .btn-default:hover {
+        background-color: #e2e8f0 !important;
+      }
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 11.5px;
+      }
 
       /* Tables */
-      .table-nfsu {
+      table, .table-nfsu {
         width: 100%;
         margin-bottom: 0;
-        border: 1px solid #e2e8f0;
+        border-collapse: collapse;
       }
-      .table-nfsu > thead > tr > th {
+      table th, .table-nfsu > thead > tr > th {
         background-color: #002147;
         color: #ffffff;
         font-family: 'Poppins', sans-serif;
@@ -300,21 +421,18 @@
         border-bottom: 2px solid #ddb55e;
         padding: 12px 14px;
       }
-      .table-nfsu > tbody > tr > td {
+      table td, .table-nfsu > tbody > tr > td {
         padding: 11px 14px;
         vertical-align: middle;
         border-top: 1px solid #edf2f7;
         font-size: 13.5px;
       }
-      .table-nfsu > tbody > tr:nth-of-type(even) {
-        background-color: #fbfcfd;
-      }
-      .table-nfsu > tbody > tr:hover {
+      table tr:hover td, .table-nfsu > tbody > tr:hover td {
         background-color: #f1f5f9;
       }
 
       /* Badges & Tags */
-      .badge-nfsu {
+      .badge, .badge-nfsu {
         display: inline-block;
         padding: 4px 10px;
         font-size: 11px;
@@ -323,11 +441,11 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
-      .badge-nfsu-success { background: #dcfce7; color: #15803d; }
-      .badge-nfsu-danger { background: #fee2e2; color: #b91c1c; }
-      .badge-nfsu-warning { background: #fef3c7; color: #b45309; }
-      .badge-nfsu-info { background: #e0f2fe; color: #0369a1; }
-      .badge-nfsu-navy { background: #002147; color: #ffffff; }
+      .badge-success, .badge-nfsu-success { background: #dcfce7 !important; color: #15803d !important; }
+      .badge-danger, .badge-nfsu-danger { background: #fee2e2 !important; color: #b91c1c !important; }
+      .badge-warning, .badge-warn, .badge-nfsu-warning { background: #fef3c7 !important; color: #b45309 !important; }
+      .badge-info, .badge-nfsu-info { background: #e0f2fe !important; color: #0369a1 !important; }
+      .badge-neutral, .badge-nfsu-navy { background: #002147 !important; color: #ffffff !important; }
 
       /* Stat Widget Cards */
       .stat-widget {
@@ -344,17 +462,6 @@
       .stat-widget:hover {
         transform: translateY(-2px);
         box-shadow: 0 6px 14px rgba(0,0,0,0.07);
-      }
-      .stat-widget-icon {
-        width: 54px;
-        height: 54px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        margin-right: 18px;
-        flex-shrink: 0;
       }
       .stat-widget-content h3 {
         margin: 0;
@@ -406,136 +513,7 @@
         padding: 22px;
       }
 
-      /* Compatibility aliases for panels, tables, badges, buttons, forms */
-      .panel {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        margin-bottom: 24px;
-        overflow: hidden;
-      }
-      .panel-header {
-        padding: 16px 20px;
-        border-bottom: 1px solid #edf2f7;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #ffffff;
-      }
-      .panel-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #002147;
-        margin: 0;
-      }
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 25px;
-      }
-      .page-title {
-        font-size: 22px;
-        font-weight: 700;
-        color: #002147;
-        margin: 0 0 6px 0;
-      }
-      .page-subtitle {
-        color: #64748b;
-        font-size: 13.5px;
-        margin: 0;
-      }
-      .btn {
-        border-radius: 4px;
-        font-family: 'Poppins', sans-serif;
-        font-size: 12.5px;
-        font-weight: 600;
-        padding: 7px 14px;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .btn-primary {
-        background-color: #002147 !important;
-        border-color: #002147 !important;
-        color: #ffffff !important;
-      }
-      .btn-primary:hover {
-        background-color: #001733 !important;
-        color: #ddb55e !important;
-      }
-      .btn-accent {
-        background-color: #ddb55e !important;
-        border-color: #cdad68 !important;
-        color: #002147 !important;
-        font-weight: 700;
-      }
-      .btn-accent:hover {
-        background-color: #c89e47 !important;
-        color: #001733 !important;
-      }
-      .btn-secondary, .btn-default {
-        background-color: #f1f5f9 !important;
-        border-color: #cbd5e1 !important;
-        color: #002147 !important;
-      }
-      .btn-secondary:hover, .btn-default:hover {
-        background-color: #e2e8f0 !important;
-      }
-      .btn-outline {
-        background-color: transparent !important;
-        border: 1px solid #002147 !important;
-        color: #002147 !important;
-      }
-      .btn-outline:hover {
-        background-color: #002147 !important;
-        color: #ffffff !important;
-      }
-      .btn-sm {
-        padding: 4px 10px;
-        font-size: 11.5px;
-      }
-      .badge {
-        display: inline-block;
-        padding: 4px 9px;
-        font-size: 11px;
-        font-weight: 700;
-        border-radius: 20px;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
-      }
-      .badge-success { background: #dcfce7 !important; color: #15803d !important; }
-      .badge-danger { background: #fee2e2 !important; color: #b91c1c !important; }
-      .badge-warning, .badge-warn { background: #fef3c7 !important; color: #b45309 !important; }
-      .badge-info { background: #e0f2fe !important; color: #0369a1 !important; }
-      .badge-neutral { background: #f1f5f9 !important; color: #475569 !important; }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      table th {
-        background-color: #002147;
-        color: #ffffff;
-        font-family: 'Poppins', sans-serif;
-        font-size: 12px;
-        font-weight: 600;
-        text-transform: uppercase;
-        border-bottom: 2px solid #ddb55e;
-        padding: 11px 14px;
-      }
-      table td {
-        padding: 10px 14px;
-        border-top: 1px solid #edf2f7;
-        font-size: 13.5px;
-        vertical-align: middle;
-      }
-      table tr:hover td {
-        background-color: #f8fafc;
-      }
+      /* Forms */
       .form-grid {
         display: flex;
         flex-wrap: wrap;
@@ -565,9 +543,12 @@
       /* Footer exact styles matching https://nfsu.ac.in */
       footer.bg-fixed-footer {
         background-color: #001733 !important;
+        background-image: none !important;
         color: #ffffff;
         padding-top: 55px;
         border-top: 4px solid #ddb55e;
+        position: relative;
+        z-index: 100;
       }
       footer .f-item h4 {
         color: #ffffff;
@@ -594,6 +575,7 @@
       footer .f-item.link li a:hover {
         color: #ddb55e;
         padding-left: 4px;
+        text-decoration: none;
       }
       footer .f-item.address li {
         margin-bottom: 14px;
@@ -652,27 +634,23 @@
     <!-- Start Header Top ============================================= -->
     <div class="top-bar-area address-one-lines inc-transparent-nav bg-dark text-light">
         <div class="container">
-            <div class="row">
-                <div class="col-md-5 address-info plr5">
-                    <div class="info box">
-                        <ul>
-                            <li><i class="fas fa-envelope-open"></i> info@nfsu.ac.in</li>
-                            <li><i class="fas fa-phone"></i> (079) 239 77100</li>
-                            <li><i class="fas fa-server"></i> inventory.nfsu.ac.in</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="user-login text-right col-md-7 plr5">
-                    <a href="javascript:void(0)" onclick="openScannerModal()"><i class="fas fa-barcode"></i> Barcode Scanner</a>
-                    <a href="javascript:void(0)" onclick="openSearchModal()"><i class="fas fa-search"></i> Quick Search (Ctrl+K)</a>
-                    <ul class="topHeaderLinks">
-                        <li><a href="https://nfsu-ric.in/" target="_blank">RIC-NFSU</a></li>
-                        <li><a target="_blank" href="https://nfsu.ac.in/fact">FACT Exam 2026</a></li>
-                        <li><a href="https://nfsu.ac.in/tenders">Tender</a></li>
-                        <li><a href="https://nfsu.ac.in/downloads">Downloads</a></li>
-                        <li><a href="{{ url_for('swagger_ui') }}"><i class="fas fa-code"></i> API v1</a></li>
-                    </ul>
-                </div>
+            <div class="info box">
+                <ul>
+                    <li><i class="fas fa-envelope-open"></i> info@nfsu.ac.in</li>
+                    <li><i class="fas fa-phone"></i> (079) 239 77100</li>
+                    <li><i class="fas fa-server"></i> inventory.nfsu.ac.in</li>
+                </ul>
+            </div>
+            <div class="user-login">
+                <a href="javascript:void(0)" onclick="openScannerModal()" class="btn-topbar-action"><i class="fas fa-barcode"></i> Optical Scanner</a>
+                <a href="javascript:void(0)" onclick="openSearchModal()" class="btn-topbar-action"><i class="fas fa-search"></i> Quick Search (Ctrl+K)</a>
+                <ul class="topHeaderLinks">
+                    <li><a href="https://nfsu-ric.in/" target="_blank">RIC-NFSU</a></li>
+                    <li><a target="_blank" href="https://nfsu.ac.in/fact">FACT Exam 2026</a></li>
+                    <li><a href="https://nfsu.ac.in/tenders">Tender</a></li>
+                    <li><a href="https://nfsu.ac.in/downloads">Downloads</a></li>
+                    <li><a href="{{ url_for('swagger_ui') }}"><i class="fas fa-code"></i> API v1</a></li>
+                </ul>
             </div>
         </div>
     </div>
@@ -689,9 +667,9 @@
                         <i class="fa fa-bars"></i>
                     </button>
                     <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                        <img src="https://nfsu.ac.in/assets/img/NFSU_logo.png" onerror="this.onerror=null;this.src='/static/nfsu_logo.png'" class="logo logo-display" alt="National Forensic Sciences University Logo">
+                        <img src="/assets/img/NFSU_logo.png" onerror="this.onerror=null;this.src='/static/nfsu_logo.png'" class="logo logo-display" alt="National Forensic Sciences University Logo">
+                        <img src="/assets/img/NFSU_logo.png" onerror="this.onerror=null;this.src='/static/nfsu_logo.png'" class="logo logo-scrolled" alt="National Forensic Sciences University Logo">
                     </a>
-                    <div class="admissionBtn"><a href="{{ url_for('transactions') }}"><i class="fas fa-exchange-alt"></i> Custody Issue</a></div>
                 </div>
                 <!-- End Header Navigation -->
 
@@ -699,38 +677,68 @@
                 <div class="collapse navbar-collapse" id="navbar-menu">
                     <ul class="nav navbar-nav navbar-right" data-in="#" data-out="#">
                         <li class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
-                            <a href="{{ url_for('dashboard') }}"><i class="fa fa-home f-20"></i> Home</a>
+                            <a href="{{ url_for('dashboard') }}" title="Home Command Center"><i class="fa fa-home f-20"></i></a>
                         </li>
-                        <li class="dropdown {% if request.endpoint in ['inventory_list', 'add_inventory_item', 'kits_list', 'add_kit', 'reservations_list', 'add_reservation', 'maintenance_list', 'add_maintenance'] %}active{% endif %}">
-                            <a href="{{ url_for('inventory_list') }}" class="dropdown-toggle" data-toggle="dropdown">Equipment & Labs</a>
+                        <li class="dropdown {% if request.endpoint in ['inventory_list', 'add_inventory_item', 'kits_list', 'add_kit'] %}active{% endif %}">
+                            <a href="{{ url_for('inventory_list') }}" class="dropdown-toggle" data-toggle="dropdown">Equipment & Labs <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('inventory_list') }}"><i class="fas fa-microscope"></i> All Laboratory Equipment</a></li>
                                 <li><a href="{{ url_for('add_inventory_item') }}"><i class="fas fa-plus-circle"></i> Onboard New Equipment</a></li>
                                 <li><a href="{{ url_for('kits_list') }}"><i class="fas fa-briefcase"></i> Forensic Field Kits & Bundles</a></li>
-                                <li><a href="{{ url_for('reservations_list') }}"><i class="fas fa-calendar-check"></i> Lab Bookings / Reservations</a></li>
-                                <li><a href="{{ url_for('maintenance_list') }}"><i class="fas fa-wrench"></i> NABL Calibration & Maintenance</a></li>
+                                <li><a href="{{ url_for('add_kit') }}"><i class="fas fa-box-open"></i> Assemble New Field Kit</a></li>
                             </ul>
                         </li>
                         <li class="dropdown {% if request.endpoint in ['transactions', 'due_items', 'history'] %}active{% endif %}">
-                            <a href="{{ url_for('transactions') }}" class="dropdown-toggle" data-toggle="dropdown">Chain of Custody</a>
+                            <a href="{{ url_for('transactions') }}" class="dropdown-toggle" data-toggle="dropdown">Chain of Custody <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('transactions') }}"><i class="fas fa-list-alt"></i> Custody Ledger / Issue & Return</a></li>
+                                <li><a href="{{ url_for('transactions') }}"><i class="fas fa-exchange-alt"></i> Custody Ledger / Issue & Return</a></li>
                                 <li><a href="{{ url_for('due_items') }}"><i class="fas fa-exclamation-triangle"></i> Overdue & Dispatched Items</a></li>
                                 <li><a href="{{ url_for('history') }}"><i class="fas fa-history"></i> Immutable Audit Trail</a></li>
+                                <li><a href="{{ url_for('labels_sheet') }}"><i class="fas fa-barcode"></i> Print Barcode Tag Sheet</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown {% if request.endpoint in ['reservations_list', 'add_reservation', 'maintenance_list', 'add_maintenance'] %}active{% endif %}">
+                            <a href="{{ url_for('reservations_list') }}" class="dropdown-toggle" data-toggle="dropdown">Bookings & Calibration <i class="fa fa-angle-down"></i></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ url_for('reservations_list') }}"><i class="fas fa-calendar-check"></i> Lab Bookings / Reservations</a></li>
+                                <li><a href="{{ url_for('add_reservation') }}"><i class="fas fa-calendar-plus"></i> Reserve Lab Workstation</a></li>
+                                <li><a href="{{ url_for('maintenance_list') }}"><i class="fas fa-wrench"></i> NABL Calibration & Maintenance</a></li>
+                                <li><a href="{{ url_for('add_maintenance') }}"><i class="fas fa-tools"></i> Log Calibration Work Order</a></li>
                             </ul>
                         </li>
                         <li class="dropdown {% if request.endpoint in ['students_list', 'register_student', 'student_detail'] %}active{% endif %}">
-                            <a href="{{ url_for('students_list') }}" class="dropdown-toggle" data-toggle="dropdown">Custodians</a>
+                            <a href="{{ url_for('students_list') }}" class="dropdown-toggle" data-toggle="dropdown">Custodians <i class="fa fa-angle-down"></i></a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url_for('students_list') }}"><i class="fas fa-user-graduate"></i> Forensic Scholars & Officers</a></li>
                                 <li><a href="{{ url_for('register_student') }}"><i class="fas fa-user-plus"></i> Register Custodian</a></li>
                             </ul>
                         </li>
+                        <li class="dropdown megamenu-fw">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Campuses <i class="fa fa-angle-down"></i></a>
+                            <ul class="dropdown-menu megamenu-content" role="menu" style="min-width: 600px; padding: 15px;">
+                                <li>
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://gujarat.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/guj_map.png" style="height:22px;"> Gujarat HQ</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://delhi.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/Delhi_map.png" style="height:22px;"> Delhi</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://goa.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/Goa_map.png" style="height:22px;"> Goa</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://tripura.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/Tripura_map.png" style="height:22px;"> Tripura</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://bhopal.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/bhopal_map.png" style="height:22px;"> Bhopal</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://pune.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/pune_map.png" style="height:22px;"> Pune</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://guwahati.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/guwahati_map.png" style="height:22px;"> Guwahati</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://manipur.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/manipur_map.png" style="height:22px;"> Manipur</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://dharwad.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/dharwad.png" style="height:22px;"> Dharwad</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://uganda.nfsu.ac.in" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/uganda.png" style="height:22px;"> Uganda</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://bhubaneswar.nfsu.ac.in/" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/Bhubaneswar.png" style="height:22px;"> Bhubaneswar</a></div>
+                                        <div class="col-md-3 col-sm-6"><a target="_blank" href="https://chennai.nfsu.ac.in/" style="display:flex;align-items:center;gap:6px;padding:6px;color:#002147;font-weight:600;"><img src="/assets/img/map/Chennai.png" style="height:22px;"> Chennai</a></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
                         <li class="{% if request.endpoint == 'analytics_dashboard' %}active{% endif %}">
-                            <a href="{{ url_for('analytics_dashboard') }}"><i class="fas fa-chart-line"></i> Analytics</a>
+                            <a href="{{ url_for('analytics_dashboard') }}">Analytics</a>
                         </li>
                         <li class="{% if request.endpoint == 'swagger_ui' %}active{% endif %}">
-                            <a href="{{ url_for('swagger_ui') }}"><i class="fas fa-code"></i> API v1</a>
+                            <a href="{{ url_for('swagger_ui') }}">API v1</a>
                         </li>
                     </ul>
                 </div>
@@ -740,7 +748,8 @@
     </header>
     <!-- End Header -->
 
-    <!-- Breadcrumb Area ============================================= -->
+    <!-- Breadcrumb Area (For Inner Pages) ============================================= -->
+    {% if request.endpoint != 'dashboard' %}
     <div class="breadcrumb-area shadow dark text-center bg-fixed text-light">
         <div class="container">
             <div class="row">
@@ -755,6 +764,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     <!-- End Breadcrumb Area -->
 
     <!-- Main Content Area ============================================= -->
@@ -916,6 +926,7 @@
 
     <!-- Bootstrap 3 Framework & NFSU Scripts -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/assets/js/bundle.js"></script>
 
     <script>
       // Global shortcut Ctrl+K
